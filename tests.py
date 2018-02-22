@@ -117,15 +117,15 @@ class FlaskTestCase(unittest.TestCase):
         response = tester.put("/api/businesses/1", data=json.dumps(self.businesses))
         self.assertEqual(response.status_code, 200)
 
-    # def test_API_can_delete_a_business(self):
-    #     """Tests if a business is deleted(to be modified)"""
-    #     tester = app.test_client(self)
-    #     response = tester.delete("/api/businesses/<business_id>", data=json.dumps(self.businesses))
-    #     self.assertEqual(response.status_code, 201)
-    #     self.assertIn('', str(response.data))
+    def test_API_can_delete_a_business(self):
+        """Tests if a business is deleted(to be modified)"""
+        tester = app.test_client(self)
+        response = tester.delete("/api/businesses/<business_id>", data=json.dumps(self.businesses))
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('', str(response.data))
 
     def test_API_can_post_reviews(self):
-        """Tests if a business review is added"""
+        """Tests if a business review is added(to be modified)"""
         tester = app.test_client(self)
         response = tester.post("/api/businesses/<business_id>/reviews", data=json.dumps(self.reviews))
         self.assertEqual(response.status_code, 201)
