@@ -12,17 +12,21 @@ to write reviews about the businesses they have interacted with.
 
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a99a88d28ad37a79dbf6/test_coverage)](https://codeclimate.com/github/codeclimate/codeclimate/test_coverage)
 ---
-**Contributors and Authors**
+**Authors and contributors**
  
- -Kasigazi Brian, Daniel Sebuuma, Josephine , Tumukunde Arnold, Jim Daniel Waswa, Paulus Jagwe, Bob Francis
+ ***Kasigazi Brian***
+ ***Daniel Sebuuma***
+ ***Josephine*** ***Tumukunde Arnold*** ***Jim Daniel Waswa*** ***Paulus Jagwe*** ****Bob Francis***
 
 ---
-## 
-Installation procedure
----
+## Installation procedure
+```
 run the "pip install -r requirements.txt" to install all the dependencies
+```
+
 
 ###Dependencies
+```
 astroid==1.6.1
 
 click==6.7
@@ -55,3 +59,4 @@ Werkzeug==0.14.1
 
 wrapt==1.10.11
 
+```
