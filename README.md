@@ -5,13 +5,16 @@ Andela cohort vi extended bootcamp challenge
 WeConnect provides a platform that brings businesses and individuals together.
 This platform creates awareness for businesses and gives the users the ability
 to write reviews about the businesses they have interacted with.
-
+## TEST COVERAGE
+[![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
 ---
 **Contributors and Authors**
+ 
  -Kasigazi Brian, Daniel Sebuuma, Josephine , Tumukunde Arnold, Jim Daniel Waswa, Paulus Jagwe, Bob Francis
 
 ---
 ##Installation procedure
+---
 run the "pip install -r requirements.txt" to install all the dependencies
 
 ###Dependencies
@@ -46,3 +49,4 @@ six==1.11.0
 Werkzeug==0.14.1
 
 wrapt==1.10.11
+
