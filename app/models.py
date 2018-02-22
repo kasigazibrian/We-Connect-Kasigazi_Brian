@@ -31,7 +31,7 @@ class Business(object):
         return "Business(business_id='%s')" % self.business_id
 
 
-class Signup(object):
+class Register(object):
     """Signup class for registering a new user"""
     def __init__(self, new_user_id, first_name, last_name, username, password,
                  email, gender, message):
