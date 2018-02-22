@@ -16,33 +16,21 @@ class FlaskTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.client = app.test_client(self)
         self.users = [{
-            'new_user_id': '1',
-            'first_name': 'Moses',
-            'last_name': 'Mason',
-            'email': 'moses@gmail.com',
+            'user_id': '1',
             'username': 'moses',
             'password': 'banana',
-            'gender': 'male',
-            'message': ''
-        },
-            {
-                'new_user_id': '2',
-                'first_name': 'Mable',
-                'last_name': 'Sarah',
-                'email': 'mabel@gmail.com',
-                'username': 'Mable',
-                'password': 'pineapple',
-                'gender': 'female',
-                'message': ''
-         }
-        ]
-        self.login ={
-            'user_id': '1',
-            'username': 'Mary',
-            'password': '12345',
             'message': '',
             'login_status': ''
-        }
+        },
+            {
+                'user_id': '2',
+                'username': 'Mabel',
+                'password': 'oranges',
+                'message': '',
+                'login_status': ''
+         }
+        ]
+
         self.businesses = [{
             'business_id': '1',
             'business_owner_id': '1',
@@ -76,7 +64,7 @@ class FlaskTestCase(unittest.TestCase):
         },
             {
                 'review_id': '3',
-                'business_id': '2',
+                'business_id': '3',
                 'review': 'They have poor customer care',
                 'message': '',
 
@@ -86,7 +74,6 @@ class FlaskTestCase(unittest.TestCase):
     def test_API_can_create_a_user_account(self):
         """Tests if a user account is created"""
         tester = app.test_client(self)
-
         response = tester.post("/api/auth/register", data=json.dumps(self.users))
         with response as res:
             self.assertEqual(res.status_code, 201)
@@ -95,14 +82,14 @@ class FlaskTestCase(unittest.TestCase):
     def test_log_in_post_request(self):
         """Tests if a user is logged in"""
         tester = app.test_client(self)
-        response = tester.post("/api/auth/login", data=json.dumps(self.login))
+        response = tester.post("/api/auth/login", data=json.dumps(self.users))
         self.assertEqual(response.status_code, 201)
         self.assertIn('true', str(response.data))
 
     def test_logout_post_request(self):
         """Tests if a user logs out"""
         tester = app.test_client(self)
-        response = tester.post("/api/auth/logout", data=json.dumps(self.login))
+        response = tester.post("/api/auth/logout", data=json.dumps(self.users))
         self.assertEqual(response.status_code, 200)
         self.assertIn('false', str(response.data))
 
@@ -127,22 +114,22 @@ class FlaskTestCase(unittest.TestCase):
         response = tester.post("/api/businesses", data=json.dumps(self.businesses))
         self.assertEqual(response.status_code, 201)
         self.assertIn('business created successfully', str(response.data))
-        res = tester.put('api/businesses/1', data=json.dumps(self.businesses[0]))
-        self.assertIn('no data', str(res.data))
+        response = tester.put("/api/businesses/1", data=json.dumps(self.businesses))
+        self.assertEqual(response.status_code, 200)
 
-    # def test_API_can_post_a_review(self):
+    # def test_API_can_delete_a_business(self):
     #     """Tests if a business is deleted(to be modified)"""
     #     tester = app.test_client(self)
-    #     response = tester.post("/api/businesses/<business_id>/reviews", data=json.dumps(self.businesses))
-    #     self.assertEqual(response.status_code, 200)
+    #     response = tester.delete("/api/businesses/<business_id>", data=json.dumps(self.businesses))
+    #     self.assertEqual(response.status_code, 201)
     #     self.assertIn('', str(response.data))
-    #
-    # def test_API_can_post_reviews(self):
-    #     """Tests if a business review is added"""
-    #     tester = app.test_client(self)
-    #     response = tester.post("/api/businesses/<business_id>/reviews", data=json.dumps(self.reviews))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn('Review added successfully', str(response.data))
+
+    def test_API_can_post_reviews(self):
+        """Tests if a business review is added"""
+        tester = app.test_client(self)
+        response = tester.post("/api/businesses/<business_id>/reviews", data=json.dumps(self.reviews))
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('Review added successfully', str(response.data))
 
 
 if __name__=='__main__':
