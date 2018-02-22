@@ -1,5 +1,5 @@
 """Models.py"""
-
+from flask import jsonify
 
 class User(object):
     """User class for logging in a new user"""
@@ -33,16 +33,21 @@ class Business(object):
 
         def __str__(self):
             return "Business(business_owner_id='%s')" % self.business_owner_id
-
-    def update_registered_business(self, business_id, new_business_id, business_owner_id, new_name):
+    def get_specific_business(self, business_id):
+        #check if business exists
+        if self.business_id==business_id:
+            return self.business_name
+        else:
+            return 'business doesnt exist'
+    def update_registered_business(self, business_id,business_owner_id, new_name):
         """ method allows a user update a registered business"""
 
         # check if user owns the business
-        if business_owner_id in self.business.keys():
+        if business_owner_id== self.business_owner_id:
 
-            if business_id == new_business_id:
+            if business_id == self.business_id:
                 self.business_name = new_name
-                return 'updated successfully'
+                return jsonify({'message':'updated successfully', 'new_name': self.business_name})
             else:
                 return "business does not exist!"
 
@@ -51,13 +56,13 @@ class Business(object):
 
     def delete_registered_business(self, business_owner_id, business_id):
         """ method allows a user delete a business they registered"""
-        if business_id in self.business.keys():
-            if business_owner_id in self.business.keys():
-                del self.business[business_id]
+        if business_owner_id ==self.business_owner_id:
+            if business_id==self.business_id:
+                del self.business_name
+                return 'deleted successfully'
             else:
                 return "business does not exist"
 
-            return self.business
         else:
             return "Not enough privileges to do action"
 
@@ -90,7 +95,7 @@ class Reviews(object):
 
     def delete_review (self, review_id, business_id):
         # check if business has the review
-        if business_id in self.reviews.keys():
+        if business_id ==self.business_id:
 
             # check if review exists
             if review_id == self.review_id:
