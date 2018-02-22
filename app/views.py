@@ -2,7 +2,7 @@
 
 from flask import request, jsonify
 from app import app
-from app.models import Signup, User, Business, Reviews
+from app.models import Register, User, Business, Reviews
 
 
 @app.route('/')
@@ -24,7 +24,7 @@ def register():
     email = test_user.get('email')
     gender = test_user.get('gender')
     if id and username and password and first_name and last_name and email and gender:
-        new_user = Signup(new_user_id=new_user_id, username=username, password=password,
+        new_user = Register(new_user_id=new_user_id, username=username, password=password,
                           first_name=first_name, last_name=last_name, email=email, gender=gender, message='')
         response = jsonify({
             'new_user_id': new_user.new_user_id,
@@ -110,7 +110,7 @@ def reset_password():
         email = test_user.get('email')
         gender = test_user.get('gender')
         if id and username and password and first_name and last_name and email and gender:
-            new_user = Signup(new_user_id=new_user_id, username=username, password=password,
+            new_user = Register(new_user_id=new_user_id, username=username, password=password,
                              first_name=first_name, last_name=last_name, email=email, gender=gender, message='')
             # change the password to a new value
             response = jsonify({
