@@ -2,7 +2,7 @@
 
 from flask import request, jsonify
 from app import app
-from app.models import Register, User, Business, Reviews
+from app.models import User, Business, Reviews
 
 
 @app.route('/')
@@ -17,24 +17,18 @@ def home():
 def register():
     test_users = request.get_json(force=True)
     test_user = test_users[0]
-    new_user_id = test_user.get('new_user_id')
+    user_id = test_user.get('user_id')
     username = test_user.get('username')
     password = test_user.get('password')
-    first_name =test_user.get('first_name')
-    last_name = test_user.get('last_name')
-    email = test_user.get('email')
-    gender = test_user.get('gender')
-    if id and username and password and first_name and last_name and email and gender:
-        new_user = Register(new_user_id=new_user_id, username=username, password=password,
-                          first_name=first_name, last_name=last_name, email=email, gender=gender, message='')
+    login_status = test_user.get('login_status')
+    if id and username and password:
+        new_user = User(user_id=user_id, username=username, password=password,
+                         message='', login_status=login_status)
         response = jsonify({
-            'new_user_id': new_user.new_user_id,
+            'user_id': new_user.user_id,
             'username': new_user.username,
             'password': new_user.password,
-            'first_name': new_user.first_name,
-            'last_name': new_user.last_name,
-            'gender': new_user.gender,
-            'email': new_user.email,
+            'login_status': new_user.login_status,
             'message': 'user created successfully'
         })
         response.status_code=201
@@ -45,16 +39,17 @@ def register():
 # Logs in a user
 def login():
     # obtain user data sent in a post request
-    test_user = request.get_json(force=True)
+    test_users = request.get_json(force=True)
+    test_user = test_users[0]
     user_id = test_user.get('user_id')
     username = test_user.get('username')
     password = test_user.get('password')
     message = test_user.get('message')
     login_status = test_user.get('login_status')
     if user_id and username and password:
-        new_user = User(user_id=user_id, username=username, password=password, message=message, login_status=login_status)
+        new_user = User(user_id=user_id, username=username, password=password, message=message, login_status= login_status)
         # create test user to do authentication
-        user = User(user_id=1, username='Mary', password='12345', message='',login_status='')
+        user = User(user_id='1', username='moses', password='banana', message='',login_status='')
         if(user.password == new_user.password) and (user.username == new_user.username):
             response = jsonify({
                 'user_id': new_user.user_id,
@@ -78,7 +73,8 @@ def login():
 # Logs out a user
 def logout():
     # obtain user data sent in a post request
-    test_user = request.get_json(force=True)
+    test_users = request.get_json(force=True)
+    test_user = test_users[0]
     user_id = test_user.get('user_id')
     username = test_user.get('username')
     password = test_user.get('password')
@@ -101,29 +97,24 @@ def logout():
 @app.route('/api/auth/reset-password', methods=['POST'])
 # reset user password
 def reset_password():
-    if request.method=='POST':
+    if request.method == 'POST':
         test_users = request.get_json(force=True)
         test_user = test_users[0]
-        new_user_id = test_user.get('new_user_id')
+        user_id = test_user.get('user_id')
         username = test_user.get('username')
         password = test_user.get('password')
-        first_name = test_user.get('first_name')
-        last_name = test_user.get('last_name')
-        email = test_user.get('email')
-        gender = test_user.get('gender')
-        if id and username and password and first_name and last_name and email and gender:
-            new_user = Register(new_user_id=new_user_id, username=username, password=password,
-                             first_name=first_name, last_name=last_name, email=email, gender=gender, message='')
+        message =test_user.get('message')
+        login_status =test_user.get('login_status')
+        if id and username and password:
+            new_user = User(user_id=user_id, username=username, password=password,
+                              message='', login_status=login_status)
             # change the password to a new value
             response = jsonify({
-                'new_user_id': new_user.new_user_id,
+                'new_user_id': new_user.user_id,
                 'username': new_user.username,
                 'password': 'oranges',
-                'first_name': new_user.first_name,
-                'last_name': new_user.last_name,
-                'gender': new_user.gender,
-                'email': new_user.email,
-                'message': 'user created successfully'
+                'message': 'user created successfully',
+                login_status: 'true'
             })
 
             return response
@@ -177,17 +168,11 @@ def specific_business(business_id):
     if request.method=='DELETE':
         pass
     if request.method == 'PUT':
-
-        business_update = request.get_json(force=True)
-        if business_update:
-            def update_business(business_id):
-                new_business_id = business_update.get('business_id')
-                new_business_owner_id = business_update.get('business_owner_id')
-                new_business_name = business_update.get('business_name')
-                response = business.update_registered_business(new_business_id,business_id, new_business_owner_id,
-                                                           new_business_name)
-                return response
-        return "no data"
+        update_business =request.get_json(force=True)
+        if update_business:
+            return 'business updated'
+        else:
+            return "no data"
 
 
 @app.route('/api/businesses/<business_id>/reviews', methods=['GET', 'POST'])
@@ -202,8 +187,9 @@ def reviews(business_id):
         business_id = test_review.get('business_id')
         review_id = test_review.get('review_id')
         review = test_review.get('review')
+        review_message =test_review.get('message')
         if review_id and business_id and review:
-            sample_review = Reviews(review_id=review_id,business_id=business_id,review=review)
+            sample_review = Reviews(review_id=review_id,business_id=business_id,review=review, message=review_message)
             response= jsonify({'review_id': sample_review.review_id,
                             'review' : sample_review.review,
                             'business_id': sample_review.business_id,
