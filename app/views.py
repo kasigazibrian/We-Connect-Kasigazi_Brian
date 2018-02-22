@@ -15,7 +15,8 @@ def home():
 @app.route('/api/auth/register', methods=['POST'])
 # creates user account
 def register():
-    test_user = request.get_json(force=True)
+    test_users = request.get_json(force=True)
+    test_user = test_users[0]
     new_user_id = test_user.get('new_user_id')
     username = test_user.get('username')
     password = test_user.get('password')
@@ -101,7 +102,8 @@ def logout():
 # reset user password
 def reset_password():
     if request.method=='POST':
-        test_user = request.get_json(force=True)
+        test_users = request.get_json(force=True)
+        test_user = test_users[0]
         new_user_id = test_user.get('new_user_id')
         username = test_user.get('username')
         password = test_user.get('password')
@@ -132,7 +134,7 @@ def reset_password():
 def businesses():
     if request.method == 'POST':
         test_businesses = request.get_json(force=True)
-        test_business=test_businesses[0]
+        test_business = test_businesses[0]
         business_id = test_business.get('business_id')
         business_owner_id = test_business.get('business_owner_id')
         business_name = test_business.get('business_name')
@@ -160,10 +162,10 @@ def businesses():
             response.status_code=201
             return response
         else:
-            response = jsonify({'message':'No business data obtained'})
+            response = jsonify({'message': 'No business data obtained'})
     else:
-        response= jsonify({'message':'Wrong Request'})
-        return  response
+        response = jsonify({'message': 'Wrong Request'})
+        return response
 
 
 @app.route('/api/businesses/<business_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -171,22 +173,28 @@ def businesses():
 def specific_business(business_id):
     if request.method == 'GET':
         business = request.get_json()
-
-
-    if request.method=='POST':
         pass
     if request.method=='DELETE':
         pass
-    if request.method=='PUT':
-        def update_business(business_id):
-            businesses =request.get_json(force=True)
-            # create test user who has same id as business owner moses which is 1
+    if request.method == 'PUT':
+
+        business_update = request.get_json(force=True)
+        if business_update:
+            def update_business(business_id):
+                new_business_id = business_update.get('business_id')
+                new_business_owner_id = business_update.get('business_owner_id')
+                new_business_name = business_update.get('business_name')
+                response = business.update_registered_business(new_business_id,business_id, new_business_owner_id,
+                                                           new_business_name)
+                return response
+        return "no data"
+
 
 @app.route('/api/businesses/<business_id>/reviews', methods=['GET', 'POST'])
 def reviews(business_id):
     if request.method=='GET':
         test_business_reviews = request.get_json(force=True)
-        test_review =test_business_reviews[0]
+        test_review = test_business_reviews[0]
 
     elif request.method=='POST':
         test_business_reviews = request.get_json(force=True)
