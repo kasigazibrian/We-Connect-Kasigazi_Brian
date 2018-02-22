@@ -11,7 +11,7 @@ class User(object):
         self.login_status = login_status
 
     def __str__(self):
-        return "Business(user_id='%s')" % self.user_id
+        return "User(user_id='%s')" % self.user_id
 
 
 class Business(object):
@@ -27,8 +27,35 @@ class Business(object):
         self.email = email
         self.message = message
 
-    def __str__(self):
-        return "Business(business_id='%s')" % self.business_id
+        def __str__(self):
+            return "Business(business_owner_id='%s')" % self.business_owner_id
+
+    def update_registered_business(self, business_id, new_business_id, business_owner_id, new_name):
+        """ method allows a user update a registered business"""
+
+        # check if user owns the business
+        if business_owner_id in self.business.keys():
+
+            if business_id == new_business_id:
+                self.business_name = new_name
+                return 'updated successfully'
+            else:
+                return "business does not exist!"
+
+        else:
+            return "Not enough privilege to do action"
+
+    def delete_registered_business(self, business_owner_id, business_id):
+        """ method allows a user delete a business they registered"""
+        if business_id in self.business.keys():
+            if business_owner_id in self.business.keys():
+                del self.business[business_id]
+            else:
+                return "business does not exist"
+
+            return self.business
+        else:
+            return "Not enough privileges to do action"
 
 
 class Register(object):
