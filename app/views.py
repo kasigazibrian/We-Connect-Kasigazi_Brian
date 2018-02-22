@@ -136,9 +136,10 @@ def businesses():
         if business_id and business_owner_id and business_name and business_location and business_category\
                 and email and contact_number:
             new_business = Business(business_id=business_id, business_owner_id=business_owner_id,
-                                business_name=business_name, business_location=business_location,
-                                business_category=business_category, email=email,
-                                contact_number=contact_number, message='')
+                                    business_name=business_name, business_location=business_location,
+                                    business_category=business_category, email=email,
+                                    contact_number=contact_number, message='')
+
             # change the password to a new value
             response = jsonify({
                 'business_id': new_business.business_id,
@@ -159,27 +160,52 @@ def businesses():
         return response
 
 
-@app.route('/api/businesses/<business_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/api/businesses/<int:business_id>', methods=['GET','POST','PUT','DELETE'])
 # view specific business
 def specific_business(business_id):
-    if request.method == 'GET':
-        business = request.get_json()
-        pass
+    if request.method=='GET':
+        new_business = Business(business_id=1, business_name='alarm systems', business_owner_id=1,business_category='security',
+                            contact_number='256781723456',business_location='kampala', email='deen@gmail.com', message='')
+        business = new_business.get_specific_business(business_id)
+        response = jsonify({
+                'business_name': business
+            })
+        response.status_code = 200
+        return response
+
     if request.method=='DELETE':
-        pass
+        new_business = Business(business_id=1, business_name='alarm systems', business_owner_id=1,
+                                business_category='security',
+                                contact_number='256781723456', business_location='kampala', email='deen@gmail.com',
+                                message='')
+        business = new_business.delete_registered_business(business_id=1, business_owner_id=1)
+        response = jsonify({
+            'message': business
+        })
+        response.status_code = 200
+        return response
+
     if request.method == 'PUT':
-        update_business =request.get_json(force=True)
-        if update_business:
-            return 'business updated'
-        else:
-            return "no data"
+        new_business = Business(business_id=1, business_name='alarm systems', business_owner_id=1,
+                                business_category='security',
+                                contact_number='256781723456', business_location='kampala', email='deen@gmail.com',
+                                message='')
+        business = new_business.update_registered_business(business_id=1, business_owner_id=1, new_name='mediacom')
+        return business
+
 
 
 @app.route('/api/businesses/<business_id>/reviews', methods=['GET', 'POST'])
 def reviews(business_id):
-    if request.method=='GET':
-        test_business_reviews = request.get_json(force=True)
-        test_review = test_business_reviews[0]
+    if request.method == 'GET':
+       new_review = Reviews(review_id=1,business_id=business_id, review='Good job', message='my review')
+       return jsonify({
+           'review_id': new_review.review_id,
+           'review': new_review.review,
+           'business_id': new_review.business_id,
+           'message': new_review.message
+       })
+
 
     elif request.method=='POST':
         test_business_reviews = request.get_json(force=True)
@@ -191,9 +217,9 @@ def reviews(business_id):
         if review_id and business_id and review:
             sample_review = Reviews(review_id=review_id,business_id=business_id,review=review, message=review_message)
             response= jsonify({'review_id': sample_review.review_id,
-                            'review' : sample_review.review,
-                            'business_id': sample_review.business_id,
-                            'message': 'Review added successfully'
+                               'review' : sample_review.review,
+                               'business_id': sample_review.business_id,
+                               'message': 'Review added successfully'
                             })
             response.status_code = 201
             return response
@@ -201,3 +227,4 @@ def reviews(business_id):
             return 'No review data added'
     else:
         return 'wrong request'
+
