@@ -13,6 +13,10 @@ class User(object):
     def __str__(self):
         return "User(user_id='%s')" % self.user_id
 
+    def password_reset(self, new_password, old_password):
+        self.password= new_password
+        return "password has been reset"
+
 
 class Business(object):
     """Business class for registering a new business"""
@@ -58,23 +62,6 @@ class Business(object):
             return "Not enough privileges to do action"
 
 
-class Register(object):
-    """Signup class for registering a new user"""
-    def __init__(self, new_user_id, first_name, last_name, username, password,
-                 email, gender, message):
-        self.new_user_id = new_user_id
-        self.first_name = first_name
-        self.last_name = last_name
-        self.username = username
-        self.password = password
-        self.email = email
-        self.gender = gender
-        self.message = message
-
-    def __str__(self):
-        return "Signup(id='%s')" % self.new_user_id
-
-
 class Reviews(object):
     """Reviews class for creating a review"""
     def __init__(self, review_id, business_id, review, message):
@@ -85,3 +72,32 @@ class Reviews(object):
 
     def __str__(self):
         return "Reviews(id='%s')" % self.review_id
+
+    def add_review(self, review_id,business_id, review):
+        """ method allows a user add a review to a registered business"""
+
+        # check if business has the review
+        if business_id in self.reviews.keys():
+
+            if review_id == self.review_id:
+                self.review = review
+                return 'updated successfully'
+            else:
+                return "review does not exist!"
+
+        else:
+            return "Not enough privilege to do action"
+
+    def delete_review (self, review_id, business_id):
+        # check if business has the review
+        if business_id in self.reviews.keys():
+
+            # check if review exists
+            if review_id == self.review_id:
+                del review_id
+                return 'deleted successfully'
+            else:
+                return "review does not exist!"
+
+        else:
+            return "Not enough privilege to do action"
