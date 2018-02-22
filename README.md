@@ -13,7 +13,8 @@ to write reviews about the businesses they have interacted with.
  -Kasigazi Brian, Daniel Sebuuma, Josephine , Tumukunde Arnold, Jim Daniel Waswa, Paulus Jagwe, Bob Francis
 
 ---
-##Installation procedure
+## 
+Installation procedure
 ---
 run the "pip install -r requirements.txt" to install all the dependencies
 
