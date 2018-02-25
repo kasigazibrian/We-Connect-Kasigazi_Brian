@@ -48,7 +48,7 @@ class FlaskTestCase(unittest.TestCase):
                 'business_location': 'kabale',
                 'email': 'real@gmail.com',
                 'contact_number': '256781712928'
-            },
+            }
         ]
         self.reviews =[{
             'review_id':'1',
