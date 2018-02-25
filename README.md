@@ -3,7 +3,7 @@ Andela cohort vi extended bootcamp challenge
 
 [![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
 
-[![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=master)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=master)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=feature_challenge_2)
 
 ## Description
 WeConnect provides a platform that brings businesses and individuals together.
@@ -13,9 +13,9 @@ to write reviews about the businesses they have interacted with.
 
 **Authors and contributors**
  
- ***Kasigazi Brian***
- ***Daniel Sebuuma***
- ***Josephine*** ***Tumukunde Arnold*** ***Jim Daniel Waswa*** ***Paulus Jagwe*** ***Bob Francis***
+ ***Kasigazi Brian,***
+ ***Daniel Sebuuma,***
+ ***Josephine,*** ***Tumukunde Arnold,*** ***Jim Daniel Wasswa,*** ***Paulus Jagwe,*** ***Bob Francis***
 
 ---
 ## Installation procedure
