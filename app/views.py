@@ -206,7 +206,6 @@ def reviews(business_id):
            'message': new_review.message
        })
 
-
     elif request.method=='POST':
         test_business_reviews = request.get_json(force=True)
         test_review = test_business_reviews[0]
