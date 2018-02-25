@@ -16,7 +16,7 @@ to write reviews about the businesses they have interacted with.
  
  ***Kasigazi Brian***
  ***Daniel Sebuuma***
- ***Josephine*** ***Tumukunde Arnold*** ***Jim Daniel Waswa*** ***Paulus Jagwe*** ****Bob Francis***
+ ***Josephine*** ***Tumukunde Arnold*** ***Jim Daniel Waswa*** ***Paulus Jagwe*** ***Bob Francis***
 
 ---
 ## Installation procedure
@@ -25,9 +25,11 @@ run the "pip install -r requirements.txt" to install all the dependencies
 ```
 
 
-###Dependencies
+### Dependencies
 ```
 astroid==1.6.1
+
+attrs==17.4.0
 
 click==6.7
 
@@ -36,6 +38,8 @@ colorama==0.3.9
 Flask==0.12.2
 
 Flask-JWT==0.3.2
+
+flask-swagger==0.2.13
 
 isort==4.3.4
 
@@ -49,14 +53,21 @@ MarkupSafe==1.0
 
 mccabe==0.6.1
 
+pluggy==0.6.0
+
+py==1.5.2
+
 PyJWT==1.4.2
 
 pylint==1.8.2
+
+pytest==3.4.1
+
+PyYAML==3.12
 
 six==1.11.0
 
 Werkzeug==0.14.1
 
 wrapt==1.10.11
-
 ```
