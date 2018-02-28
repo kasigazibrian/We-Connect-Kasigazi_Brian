@@ -1,5 +1,5 @@
 
-from app import app
+from app.v1 import app
 import unittest
 import json, jwt
 
