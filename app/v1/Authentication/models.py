@@ -1,5 +1,5 @@
 from flask import jsonify, request, make_response
-from app import app
+from app.v1 import app
 import jwt, datetime
 
 class User(object):

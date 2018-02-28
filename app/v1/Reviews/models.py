@@ -1,4 +1,4 @@
-from flask import jsonify
+"""Class for Business Reviews"""
 
 
 class BusinessReviews(object):

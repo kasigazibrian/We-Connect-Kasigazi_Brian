@@ -1,7 +1,7 @@
 """views.py"""
 from flask import request, jsonify
-from app import app, api
-from app.Business.models import Business
+from app.v1 import app, api
+from app.v1.Business.models import Business
 from flask_restful import Resource
 from functools import wraps
 import jwt

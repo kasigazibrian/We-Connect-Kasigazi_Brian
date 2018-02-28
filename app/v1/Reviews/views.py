@@ -1,6 +1,6 @@
 from flask import request, jsonify
-from app import api
-from app.Reviews.models import BusinessReviews
+from app.v1 import api
+from app.v1.Reviews.models import BusinessReviews
 from flask_restful import Resource
 
 

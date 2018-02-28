@@ -1,8 +1,8 @@
 """views.py"""
 from flask import request, jsonify, make_response
-from app import app, api
+from app.v1 import app, api
 from flask_restful import Resource
-from app.Authentication.models import User
+from app.v1.Authentication.models import User
 from functools import wraps
 import jwt
 
