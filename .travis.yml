@@ -7,7 +7,10 @@ install:
   - pip install -r requirements.txt
 
 # command to run tests
-script: pytest --cov tests.py
+script:
+  - nosetests --with-xcoverage --cover-tests/test_user
+  - nosetests --with-xcoverage --cover-tests/test_business
+  - nosetests --with-xcoverage --cover-tests/test_review
 
 after_success:
   -coverage report
