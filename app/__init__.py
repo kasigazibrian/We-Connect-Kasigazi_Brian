@@ -1,9 +1,13 @@
-"""__init__.py"""
 from flask import Flask
+from flask_restful import Api
 
 
 app = Flask(__name__)
 
+app.config.from_pyfile("../config.py")
 
-app.config.from_pyfile('../config.py')
-from app import views
+api = Api(app)
+
+from app.Authentication import views
+from app.Reviews import views
+from app.Business import views
