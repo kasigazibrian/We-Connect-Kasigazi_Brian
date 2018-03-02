@@ -94,19 +94,18 @@ def logout(current_user):
         return jsonify({"message":"Please first login to perform the action"})
 
 
+@app.route('/api/v2/auth/reset-password', methods=['POST'])
+# route to the reset-password
+@jwt_required
+def reset_password(current_user):
+    """Reset user password"""
+    new_user_data = request.get_json(force=True)
+    new_password = new_user_data.get('password')
+    response = User.password_reset(current_user, new_password)
+    return response
 
 
-class PasswordReset(Resource):
-    """class for resetting password"""
-    # @jwt_required
-    def post(self, current_user):
-        """Reset user password"""
-        new_user_data = request.get_json(force=True)
-        new_password = new_user_data.get('password')
-        response = User.password_reset(current_user, new_password)
-        return response
-
-api.add_resource(Home, '/')
+api.add_resource(Home, '/','/home')
 api.add_resource(Register, '/api/v2/auth/register')
 api.add_resource(Login, '/api/v2/login')
-api.add_resource(PasswordReset, '/api/v2/auth/reset-password')
+# api.add_resource(PasswordReset, '/api/v2/auth/reset-password')

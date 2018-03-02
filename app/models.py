@@ -63,9 +63,9 @@ class User(db.Model):
             return jsonify({'message': 'An error occurred. Please contact administrator'})
 
     @staticmethod
-    def password_reset(user_id, password):
+    def password_reset(current_user, password):
         """reset user password"""
-        user = User.query.filterby(user_id=user_id).first()
+        user = User.query.filter_by(user_id=current_user.user_id).first()
         if user:
             user.password = password
             db.session.commit()
@@ -107,17 +107,26 @@ class Business(db.Model):
             return jsonify({'message':'An error occurred. Please contact administrator '})
 
     @staticmethod
-    def delete_business(self, business_id, business_owner_id):
+    def delete_business( business_id, user_id):
         """Delete a business"""
-        delete_business = Business.query.filter_by(business_id=business_id).first()
-        if delete_business:
-            if business_owner_id == delete_business.business_owner_id:
-                db.session.delete(delete_business)
-                db.session.commit()
+        my_user =  User.query.filter_by(user_id=user_id).first()
+        if my_user:
+            relation = my_user.business_owner.filter_by(business_id=business_id).first()
+            if relation:
+                delete_business = Business.query.filter_by(business_id=business_id).first()
+                if delete_business:
+                    if relation.business_owner_id == user_id:
+                        db.session.delete(delete_business)
+                        db.session.commit()
+                        return jsonify({"message": "Business has been deleted successfully"})
+                    else:
+                        return jsonify({'message': 'You do not have enough privileges to delete this business'})
+                else:
+                    return jsonify({'message': 'Business does not exist'})
             else:
                 return jsonify({'message': 'You do not have enough privileges to delete this business'})
         else:
-            return jsonify({'message': 'Business does not exist'})
+            return jsonify({'message': 'You do not have enough privileges to delete this business'})
 
     @staticmethod
     def get_specific_business(business_id):
@@ -175,7 +184,8 @@ class BusinessReviews(db.Model):
             db.session.rollback()
             return jsonify({'message': 'An error occurred. Please contact administrator '})
 
-    def get_all_reviews(self, business_id):
+    @staticmethod
+    def get_all_reviews( business_id):
         all_reviews = BusinessReviews.query.filter_by(business_id=business_id).all()
         if all_reviews:
             reviews_added = []
