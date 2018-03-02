@@ -29,7 +29,7 @@ class FlaskTestCase(BaseTestCase):
     def test_API_can_post_reviews(self):
         """Tests if a business review is added"""
         tester = app.test_client(self)
-        response = tester.post("/api/businesses/1/reviews", data=json.dumps(self.review))
+        response = tester.post("/api/v2/businesses/1/reviews", data=json.dumps(self.review))
         # check for review content
         self.assertIn('This business is the best', str(response.data))
 
@@ -39,7 +39,7 @@ class FlaskTestCase(BaseTestCase):
         response = tester.post("/api/businesses/1/reviews", data=json.dumps(self.review))
         # check for review content
         self.assertIn('This business is the best', str(response.data))
-        response = tester.get("/api/businesses/1/reviews")
+        response = tester.get("/api/v2/businesses/1/reviews")
         self.assertEqual(response.status_code, 200)
         self.assertIn('This business is awesome', str(response.data))
         self.assertIn('This business rocks', str(response.data))
