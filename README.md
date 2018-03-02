@@ -1,5 +1,5 @@
 # We-Connect-Kasigazi_Brian
-<<<<<<< HEAD
+
 Andela cohort vi extended bootcamp challenge
 
 [![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
