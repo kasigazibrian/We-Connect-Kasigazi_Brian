@@ -44,27 +44,27 @@ class FlaskTestCase(BaseTestCase):
         # self.assertEqual(response.status_code, 201)
         #self.assertIn('User added successfully', str(response.data))
 
-    # def test_log_in_post_request(self):
-    #     """Tests if a user is logged in"""
-    #     new_user = {"username":'moses',"password":"banana"}
-    #     response = self.client.post("/api/v2/login", data=json.dumps(new_user))
-    #     self.assertEqual(response.status_code, 201)
-    #     self.assertIn('Token created successfully', str(response.data))
-    #
-    # def test_logout_post_request_will_fail_without_token(self):
-    #     """Tests if a user logs out"""
-    #     new_user = {"username": 'moses', "password": "banana"}
-    #     response = self.client.post("/api/v2/auth/logout", data=json.dumps(new_user))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn('Token is missing', str(response.data))
-    #
-    # def test_password_reset_post_request_will_fail_without_token(self):
-    #     """Tests if the new password for a user is obtained"""
-    #     # Test using user Moses and change his password from banana to oranges
-    #     new_password ={'password': 'pineapple'}
-    #     response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password))
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn('Token is missing', str(response.data))
+    def test_log_in_post_request(self):
+        """Tests if a user is logged in"""
+        new_user = {"username":'moses',"password":"banana"}
+        response = self.client.post("/api/v2/login", data=json.dumps(new_user))
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('Token created successfully', str(response.data))
+    
+    def test_logout_post_request_will_fail_without_token(self):
+        """Tests if a user logs out"""
+        new_user = {"username": 'moses', "password": "banana"}
+        response = self.client.post("/api/v2/auth/logout", data=json.dumps(new_user))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Token is missing', str(response.data))
+    
+    def test_password_reset_post_request_will_fail_without_token(self):
+        """Tests if the new password for a user is obtained"""
+        # Test using user Moses and change his password from banana to oranges
+        new_password ={'password': 'pineapple'}
+        response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('Token is missing', str(response.data))
 
 
 if __name__ == '__main__':
