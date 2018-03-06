@@ -5,6 +5,9 @@ cache: pip
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
+  - pip install coverage
+  - pip install nosexcover
 
 # command to run tests
 script:
