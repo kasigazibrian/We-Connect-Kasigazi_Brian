@@ -4,7 +4,7 @@ Andela cohort vi extended bootcamp challenge
 
 [![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
 
-[![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian)
+[![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=master)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=master)
 
 
 ## Description
