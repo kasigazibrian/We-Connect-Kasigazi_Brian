@@ -6,7 +6,6 @@ Andela cohort vi extended bootcamp challenge
 
 [![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=master)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=master)
 
-
 ## Description
 WeConnect provides a platform that brings businesses and individuals together.
 This platform creates awareness for businesses and gives the users the ability
