@@ -1,5 +1,5 @@
 """Runserver.py"""
-from app import app
+from app.app import app
 from os import environ
 
 
