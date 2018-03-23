@@ -1,10 +1,11 @@
 """models.py"""
-from flask import jsonify, make_response
+from flask import jsonify
 from werkzeug.security import check_password_hash
 import jwt
-from app import app, db
+from app.app import app, db
 from datetime import datetime, timedelta
 from sqlalchemy import exc
+import re
 
 
 class User(db.Model):
@@ -61,6 +62,20 @@ class User(db.Model):
         except exc.IntegrityError:
             db.session.rollback()
             return jsonify({'message': 'An error occurred. Please contact administrator'})
+
+    @staticmethod
+    def is_valid_email(email):
+        if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def is_valid_gender(gender):
+        if re.match(r"(^(?:m|M|male|Male|f|F|female|Female)$)",gender):
+            return True
+        else:
+            return False
 
     @staticmethod
     def password_reset(current_user, password):
@@ -163,6 +178,13 @@ class Business(db.Model):
                 registered_businesses.append(business_data)
             return jsonify({'Businesses': registered_businesses})
 
+    @staticmethod
+    def is_valid_email(email):
+        if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+            return True
+        else:
+            return False
+
 
 class BusinessReviews(db.Model):
     """Class model for business reviews"""
@@ -196,7 +218,7 @@ class BusinessReviews(db.Model):
                 reviews_added.append(review_data)
             return jsonify({'Businesses': reviews_added})
         else:
-            return jsonify({'message': 'No reviews have been added'})
+            return jsonify({'message': 'No business reviews have been added yet'})
 
 
 class Token(db.Model):
@@ -228,8 +250,3 @@ class Token(db.Model):
             return True
         else:
             return False
-
-
-
-
-
