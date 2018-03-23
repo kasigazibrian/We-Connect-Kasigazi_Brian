@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource
-from app import app, api
+from app.app import app, api
 from werkzeug.security import generate_password_hash
 from app.models import User, Token
 import jwt
@@ -49,21 +49,29 @@ class Register(Resource):
         email = new_user.get('email')
         gender = new_user.get('gender')
         if username and password and first_name and last_name and email and gender:
-            hashed_password = generate_password_hash(password, method='sha256')
-            if not User.query.filter_by(username=username).first():
-                if not User.query.filter_by(email=email).first():
-                    login_status = False
-                    add_new_user = User(username=username, password=hashed_password, first_name=first_name,
+            if User.is_valid_email(email) is True:
+                if User.is_valid_gender(gender) is True:
+                    hashed_password = generate_password_hash(password, method='sha256')
+                    if not User.query.filter_by(username=username).first():
+                        if not User.query.filter_by(email=email).first():
+                            login_status = False
+                            add_new_user = User(username=username, password=hashed_password, first_name=first_name,
                                     last_name=last_name, email=email, gender=gender, login_status=login_status)
 
-                    response = User.add_user(add_new_user)
-                    return  response
+                            response = User.add_user(add_new_user)
+                            response.status_code = 201;
+                            return  response
+                        else:
+                            return jsonify({"message":"Email address already exists"})
+                    else:
+                        return jsonify({'message':'User already exists'})
                 else:
-                    return jsonify({"message":"Email address already exists"})
+                    return jsonify({'message':'Invalid gender. Try Male, Female, M, F'})
             else:
-                return jsonify({'message':'User already exists'})
+                return jsonify({"message": "Not a valid email address"})
         else:
-            return jsonify({'message': 'All fields are required'})
+            return jsonify({'message': 'All fields are required, that is username,'
+                                       ' password, first_name, last_name, email and gender'})
 
 
 class Login(Resource):
@@ -101,7 +109,8 @@ def reset_password(current_user):
     """Reset user password"""
     new_user_data = request.get_json(force=True)
     new_password = new_user_data.get('password')
-    response = User.password_reset(current_user, new_password)
+    my_new_password = generate_password_hash(new_password, method='sha256')
+    response = User.password_reset(current_user, my_new_password)
     return response
 
 
