@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restful import Resource
-from app import app, api
+from app.app import app, api
 from app.models import Business, db, User
 from app.Authentication.views import  jwt_required
 
@@ -17,13 +17,26 @@ def register_business(current_user):
     business_nominal_capital = business_data.get('business_nominal_capital')
     business_category = business_data.get('business_category')
     if business_name and business_category and business_location and business_email and business_nominal_capital:
-        new_business = Business(business_owner_id=business_owner_id, business_name=business_name,
+        if Business.is_valid_email(business_email) is True:
+            my_business = Business.query.filter_by(business_name=business_name).first()
+            if not my_business:
+                my_business_email = Business.query.filter_by(business_email=business_email).first()
+                if not my_business_email:
+                    new_business = Business(business_owner_id=business_owner_id, business_name=business_name,
                                 business_email=business_email, business_location=business_location,
                                 business_nominal_capital=business_nominal_capital, business_category=business_category)
-        response = new_business.register_business(new_business)
-        return response
+
+                    response = new_business.register_business(new_business)
+                    return response
+                else:
+                    return jsonify({"message": "Email already exists"})
+            else:
+                return jsonify({"message":"Business already exists"})
+        else:
+            return jsonify({"message":"Not a valid email address"})
     else:
-        return jsonify({"message":"All fields are required"})
+        return jsonify({"message":"All fields are required, that is business_name, business_email,"
+                                  "business_location, business_nominal_capital and business_category"})
 
 
 class GetAllBusinesses(Resource):
@@ -83,6 +96,3 @@ api.add_resource(GetAllBusinesses, '/api/v2/businesses')
 api.add_resource(GetSpecificBusiness, '/api/v2/businesses/<business_id>')
 # api.add_resource(UpdateBusinessProfile, '/api/v2/businesses/<business_id>')
 # api.add_resource(DeleteBusiness, '/api/v2/businesses/<business_id>')
-
-
-
