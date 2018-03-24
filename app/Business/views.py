@@ -1,8 +1,10 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from app.app import app, api
-from app.models import Business, db, User
-from app.Authentication.views import  jwt_required
+from app.models import Business
+from app.Authentication.views import jwt_required
+from app.Business.search_model import search_by_name, search_by_category,\
+    search_by_location, search_by_location_and_category
 
 
 @app.route('/api/v2/businesses', methods=['POST'])
@@ -23,10 +25,12 @@ def register_business(current_user):
                 my_business_email = Business.query.filter_by(business_email=business_email).first()
                 if not my_business_email:
                     new_business = Business(business_owner_id=business_owner_id, business_name=business_name,
-                                business_email=business_email, business_location=business_location,
-                                business_nominal_capital=business_nominal_capital, business_category=business_category)
+                                            business_email=business_email, business_location=business_location,
+                                            business_nominal_capital=business_nominal_capital,
+                                            business_category=business_category)
 
                     response = new_business.register_business(new_business)
+                    response.status_code = 201
                     return response
                 else:
                     return jsonify({"message": "Email already exists"})
@@ -42,8 +46,26 @@ def register_business(current_user):
 class GetAllBusinesses(Resource):
     """Class for getting all the businesses"""
     def get(self):
-        response = Business.get_all_businesses()
-        return response
+        business_name= request.args.get('q')
+        business_category = request.args.get('category')
+        business_location = request.args.get('location')
+        if business_name:
+            my_search_result = search_by_name(business_name)
+            return my_search_result
+
+        elif business_category and not business_location:
+           my_search_result = search_by_category(business_category)
+           return my_search_result
+
+        elif business_location and not business_category:
+            my_search_result = search_by_location(business_location)
+            return my_search_result
+        elif business_category and business_location:
+            my_search_result = search_by_location_and_category(business_location, business_category)
+            return my_search_result
+        else:
+            response = Business.get_all_businesses()
+            return response
 
 
 class GetSpecificBusiness(Resource):
@@ -72,23 +94,19 @@ def business_operations(current_user, business_id):
         business_location = business_data.get('business_location')
         business_nominal_capital = business_data.get('business_nominal_capital')
         business_category = business_data.get('business_category')
-
-        business = Business.query.filter_by(business_id=business_id).first()
-        if business:
-            relation = User.query.filter_by(user_id=current_user.user_id).first()
-            business_posessor = relation.business_owner.filter_by(business_id=business_id).first()
-            if business_posessor.business_owner_id == current_user.user_id:
-                business.business_name = business_name
-                business.business_email = business_email
-                business.business_location = business_location
-                business.business_nominal_capital = business_nominal_capital
-                business.business_category = business_category
-                db.session.commit()
-                return jsonify({'message': 'Business updated successfully'})
+        if business_email:
+            if Business.is_valid_email(business_email) is True:
+                response = Business.update_business(business_id,current_user,business_name,business_email,
+                                                    business_location, business_nominal_capital,
+                                                    business_category)
+                return response
             else:
-                return jsonify({'messsage': 'Not enough privilege to perform action'})
+                return jsonify({"message": "Not a valid email address"})
         else:
-            return jsonify({'message': 'Business not found'})
+            response = Business.update_business(business_id, current_user, business_name, business_email,
+                                                business_location, business_nominal_capital,
+                                                business_category)
+            return response
 
 
 # api.add_resource(RegisterBusiness, '')
