@@ -93,12 +93,16 @@ class Business(db.Model):
     """class model for the business"""
     business_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     business_owner_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    business_name = db.Column(db.VARCHAR(100), nullable=False)
+    business_name = db.Column(db.VARCHAR(100), nullable=False, unique=True)
     business_email = db.Column(db.VARCHAR(100), unique=True)
     business_location = db.Column(db.VARCHAR(150), nullable=False)
     business_nominal_capital = db.Column(db.FLOAT)
     business_category = db.Column(db.VARCHAR(150))
     business_review = db.relationship('BusinessReviews', backref='review_owner', lazy='dynamic')
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_modified = db.Column(
+        db.DateTime, default=db.func.current_timestamp(),
+        onupdate=db.func.current_timestamp())
 
     def __init__(self, business_owner_id, business_name,business_email, business_location,
                  business_nominal_capital, business_category):
@@ -137,7 +141,7 @@ class Business(db.Model):
                     else:
                         return jsonify({'message': 'You do not have enough privileges to delete this business'})
                 else:
-                    return jsonify({'message': 'Business does not exist'})
+                    return jsonify({'message': 'Business not found'})
             else:
                 return jsonify({'message': 'You do not have enough privileges to delete this business'})
         else:
@@ -185,6 +189,41 @@ class Business(db.Model):
         else:
             return False
 
+    @staticmethod
+    def update_business(business_id, current_user, business_name, business_email, business_location,
+                        business_nominal_capital,business_category):
+        business = Business.query.filter_by(business_id=business_id).first()
+        if business:
+            relation = User.query.filter_by(user_id=current_user.user_id).first()
+            business_possessor = relation.business_owner.filter_by(business_id=business_id).first()
+            if business_possessor:
+                if business_possessor.business_owner_id == current_user.user_id:
+                    if business_name:
+                        try:
+                            business.business_name = business_name
+                            db.session.commit()
+                        except exc.IntegrityError:
+                            return jsonify({"message": "Business name already exists"})
+                    if business_email:
+                        business.business_email = business_email
+                        db.session.commit()
+                    if business_location:
+                        business.business_location = business_location
+                        db.session.commit()
+                    if business_nominal_capital:
+                        business.business_nominal_capital = business_nominal_capital
+                        db.session.commit()
+                    if business_category:
+                        business.business_category = business_category
+                        db.session.commit()
+                    return jsonify({'message': 'Business updated successfully'})
+                else:
+                    return jsonify({'messsage': 'Not enough privilege to perform action'})
+            else:
+                return jsonify({'messsage': 'Not enough privilege to perform action'})
+        else:
+            return jsonify({'message': 'Business not found'})
+
 
 class BusinessReviews(db.Model):
     """Class model for business reviews"""
@@ -225,6 +264,7 @@ class Token(db.Model):
     """class for deactivating token"""
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token = db.Column(db.VARCHAR(500), unique=True, nullable=False)
+    blacklisted_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     def __init__(self, token):
         self.token = token
