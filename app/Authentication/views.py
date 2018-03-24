@@ -2,7 +2,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from app.app import app, api
 from werkzeug.security import generate_password_hash
-from app.models import User, Token
+from app.models import User, Token, db
 import jwt
 from functools import wraps
 
@@ -18,11 +18,10 @@ def jwt_required(f):
                     try:
                         data = jwt.decode(token, app.config['SECRET_KEY'])
                         current_user = User.query.filter_by(username=data['username']).first()
-
-                    except:
-                        return jsonify({'message': 'Token is missing'})
+                    except jwt.ExpiredSignatureError:
+                        return jsonify({'message': 'Your session has expired!. Please log in again.'})
                 else:
-                    return jsonify({"message":"Your session has expired!. Please login to perform action"})
+                    return jsonify({"message":"Your session has expired!. Please login again"})
             else:
                 return jsonify({'message': 'Token is missing'})
         else:
@@ -77,11 +76,12 @@ class Register(Resource):
 class Login(Resource):
     def post(self):
         """Logs in a user"""
-        test_user = request.get_json()
+        test_user = request.get_json(force=True)
         username = test_user.get('username')
         password = test_user.get('password')
         if username and password:
             response = User.login(username=username,password=password)
+            response.status_code = 201
             return response
 
         else:
