@@ -15,14 +15,18 @@ class AddBusinessReview(Resource):
     def post(self, business_id):
         new_review_data = request.get_json(force=True)
         review = new_review_data.get('review')
-        mybusiness = Business.query.filter_by(business_id=business_id).first()
-        if mybusiness:
-            new_business_review = BusinessReviews(review=review, business_id=business_id)
-            add_business_review = BusinessReviews.add_review(new_business_review)
-            return add_business_review
+        if review:
+            mybusiness = Business.query.filter_by(business_id=business_id).first()
+            if mybusiness:
+                new_business_review = BusinessReviews(review=review, business_id=business_id)
+                add_business_review = BusinessReviews.add_review(new_business_review)
+                add_business_review.status_code = 201
+                return add_business_review
+            else:
+                return jsonify({"message":"Business to add a review to does not exist. Please ensure"
+                                          " that you have indicated the correct business id"})
         else:
-            return jsonify({"message":"Business to add a review to does not exist. Please ensure"
-                                      " that you have indicated the correct business id"})
+            return jsonify({"message": "No Review has been added"})
 
 
 api.add_resource(GetAllBusinessReviews,'/api/v2/businesses/<business_id>/reviews')
