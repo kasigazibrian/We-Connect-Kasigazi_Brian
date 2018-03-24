@@ -1,6 +1,6 @@
 import json
 import unittest
-from app.models import db, User
+from app.models import db
 from app.app import app
 from flask_testing import TestCase
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,7 +10,7 @@ class BaseTestCase(TestCase):
     """Base test case to test the API"""
 
     def create_app(self):
-        app.config['TESTING'] = True
+        app.config.from_object('config.TestingConfig')
         # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:brian@localhost/dbtests'
         return app
 
@@ -213,7 +213,6 @@ class FlaskTestCase(BaseTestCase):
                                     headers={"access-token": result_in_json["token"]})
         self.assertEqual(response.status_code, 200)
         self.assertIn('You have successfully logged out', str(response.data))
-
 
 
 if __name__ == '__main__':
