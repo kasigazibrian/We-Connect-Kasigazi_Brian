@@ -13,7 +13,6 @@ script:
   - pytest testsv2/test_review.py
 
 before_script:
-  - python manage.py db init
   - python manage.py db migrate
   - python manage.py db upgrade
 
