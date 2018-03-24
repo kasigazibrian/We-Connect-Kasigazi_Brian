@@ -8,9 +8,9 @@ install:
 
 # command to run tests
 script:
-  - nosetests testsv2/test_user.py
-  - nosetests testsv2/test_business.py
-  - nosetests testsv2/test_review.py
+  - pytest testsv2/test_user.py
+  - pytest testsv2/test_business.py
+  - pytest testsv2/test_review.py
 
 after_success:
   -coverage report
