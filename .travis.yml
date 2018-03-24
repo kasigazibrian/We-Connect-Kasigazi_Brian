@@ -12,10 +12,6 @@ script:
   - pytest testsv2/test_business.py
   - pytest testsv2/test_review.py
 
-before_script:
-  - python manage.py db migrate
-  - python manage.py db upgrade
-
 after_success:
   -coverage report
   -coveralls
