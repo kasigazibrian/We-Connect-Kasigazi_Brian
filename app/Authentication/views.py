@@ -19,7 +19,12 @@ def jwt_required(f):
                         data = jwt.decode(token, app.config['SECRET_KEY'])
                         current_user = User.query.filter_by(username=data['username']).first()
                     except jwt.ExpiredSignatureError:
+                        my_token = Token.query.filter_by(token=token).first()
+                        my_token.tk_owner.login_status = False
+                        my_token.blacklist = True
+                        db.session.commit()
                         return jsonify({'message': 'Your session has expired!. Please log in again.'})
+
                 else:
                     return jsonify({"message":"Your session has expired!. Please login again"})
             else:
