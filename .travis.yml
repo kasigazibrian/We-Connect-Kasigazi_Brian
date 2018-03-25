@@ -14,8 +14,8 @@ before_script:
 
 # command to run tests
 script:
-  - pytest testsv2/test_user.py
-  - pytest testsv2/test_business.py
+  - pytest --cov testsv2/test_user.py
+  - pytest --cov testsv2/test_business.py
   - pytest testsv2/test_review.py
 
 after_success:
