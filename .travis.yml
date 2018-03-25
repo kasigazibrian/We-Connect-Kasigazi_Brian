@@ -14,9 +14,9 @@ before_script:
 
 # command to run tests
 script:
-  - py.test --cov testsv2/test_user.py
-  - py.test --cov testsv2/test_business.py
-  - py.test --cov testsv2/test_review.py
+  - py.test --cov =testsv2/test_user.py
+  - py.test --cov =testsv2/test_business.py
+  - py.test --cov =testsv2/test_review.py
 
 after_success:
   -coverage report
