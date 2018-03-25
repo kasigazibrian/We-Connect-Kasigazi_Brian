@@ -1,6 +1,6 @@
 import json
 import unittest
-from app.models import db
+from app.models import db, User
 from app.app import app
 from flask_testing import TestCase
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -213,6 +213,7 @@ class FlaskTestCase(BaseTestCase):
                                     headers={"access-token": result_in_json["token"]})
         self.assertEqual(response.status_code, 200)
         self.assertIn('You have successfully logged out', str(response.data))
+
 
 
 if __name__ == '__main__':
