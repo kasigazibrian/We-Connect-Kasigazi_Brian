@@ -18,6 +18,7 @@ class User(db.Model):
     email = db.Column(db.VARCHAR(50), unique=True, nullable=False)
     gender = db.Column(db.String(10))
     business_owner = db.relationship('Business', backref='owner', lazy='dynamic')
+    token_owner = db.relationship('Token', backref='tk_owner', lazy='dynamic')
     login_status = db.Column(db.Boolean, default=False)
 
     def __init__(self, username, password, first_name, last_name, email, gender, login_status):
@@ -38,11 +39,16 @@ class User(db.Model):
                 if user.login_status is False:
                     if check_password_hash(user.password, password):
                         token = jwt.encode(
-                            {'username': user.username, 'exp': datetime.utcnow() + timedelta(minutes=60)},
+                            {'username': user.username, 'exp': datetime.utcnow() + timedelta(minutes=2)},
                             app.config['SECRET_KEY'])
-                        user.login_status = True
-                        db.session.commit()
-                        return jsonify({'token': token.decode('utf-8'), 'message': 'You have successfully logged in'})
+                        decoded_token = token.decode('utf-8')
+                        result =Token.add_token(token=decoded_token, token_owner_id=user.user_id)
+                        if result=="added":
+                            user.login_status = True
+                            db.session.commit()
+                            return jsonify({'token': decoded_token, 'message': 'You have successfully logged in'})
+                        else:
+                            return jsonify({"message":"Database error. Please contact administrator"})
                     else:
                         return jsonify({'message':"Your username or password is incorrect"})
                 else:
@@ -264,19 +270,22 @@ class Token(db.Model):
     """class for deactivating token"""
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token = db.Column(db.VARCHAR(500), unique=True, nullable=False)
-    blacklisted_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    token_owner_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    blacklist = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
-    def __init__(self, token):
+    def __init__(self, token, token_owner_id):
         self.token = token
+        self.token_owner_id = token_owner_id
 
     @staticmethod
     def blacklist_token(token, user):
-        """add token to database to blacklist it"""
+        """add token to database"""
         try:
             my_user = User.query.filter_by(username=user).first()
             my_user.login_status = False
-            my_token = Token(token=token)
-            db.session.add(my_token)
+            my_token = Token.query.filter_by(token=token).first()
+            my_token.blacklist = True
             db.session.commit()
             return jsonify({'message':'You have successfully logged out'})
         except exc.ArgumentError:
@@ -286,7 +295,24 @@ class Token(db.Model):
     @staticmethod
     def check_blacklisted_token(token):
         my_token = Token.query.filter_by(token=token).first()
-        if my_token:
+        if my_token.blacklist is True:
             return True
         else:
             return False
+
+    @staticmethod
+    def add_token(token, token_owner_id):
+        my_token = Token.query.filter_by(token=token).first()
+        if not my_token:
+            try:
+                tkn = Token(token=token, token_owner_id=token_owner_id)
+                db.session.add(tkn)
+                db.session.commit()
+                return "added"
+            except:
+                db.session.rollback()
+                return jsonify({'message': 'Error accessing database'})
+        else:
+            return jsonify({"message": "Token already exists"})
+
+
