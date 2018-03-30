@@ -1,11 +1,21 @@
 """Config.py"""
-# enable debugging
-DEBUG = True
 
-# enable testing
 
-TESTING = True
+class Config(object):
+    DEBUG = False
+    TESTING = False
+    SECRET_KEY = 'abcdefg'
 
-# secret key
 
-SECRET_KEY = 'secret'
+class DevelopmentConfig(Config):
+    DEVELOPMENT = True
+    # Enable debugging
+    DEBUG = True
+
+class TestingConfig(Config):
+    # Enable testing
+    TESTING = True
+    DEBUG = True
+
+
+
