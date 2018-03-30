@@ -1,11 +1,10 @@
 # We-Connect-Kasigazi_Brian
+
 Andela cohort vi extended bootcamp challenge
 
 [![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
 
-[![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=feature_challenge_2)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=feature_challenge_2)
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/8cc3a4dcd5e37d903ad7/maintainability)](https://codeclimate.com/github/kasigazibrian/We-Connect-Kasigazi_Brian/maintainability)
+[![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=master)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=master)
 
 ## Description
 WeConnect provides a platform that brings businesses and individuals together.
@@ -17,7 +16,10 @@ to write reviews about the businesses they have interacted with.
  
  ***Kasigazi Brian,***
  ***Daniel Sebuuma,***
- ***Josephine,*** ***Tumukunde Arnold,*** ***Jim Daniel Wasswa,*** ***Paulus Jagwe,*** ***Bob Francis***
+***Ashaba John,***
+ ***Jim Daniel Wasswa,*** 
+ ***Paulus Jagwe,*** 
+
 
 ---
 ## Installation procedure
@@ -72,3 +74,6 @@ Werkzeug==0.14.1
 
 wrapt==1.10.11
 ```
+=======
+
+

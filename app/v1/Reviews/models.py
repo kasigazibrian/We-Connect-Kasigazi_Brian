@@ -19,17 +19,14 @@ class BusinessReviews(object):
         if my_reviews:
             return my_reviews
         else:
-            return "Business reviews not found"
+            return {"business_name": "Not found", "review": "None"}
 
     @staticmethod
     def add_review(review):
         """ method allows a user to add a review to a registered business"""
-
-        # check if the business that has the review exists
-        sample_review = BusinessReviews(review_id=review.review_id, business_id=review.business_id, review=review.review)
-        response = {'review_id': sample_review.review_id,
-                    'review': sample_review.review,
-                    'business_id': sample_review.business_id,
-                    'message': 'Review has been added successfully'
+        # check if the business to add the review to exists
+        response = {'review_id': review.review_id,
+                    'review': review.review,
+                    'business_id': review.business_id,
                     }
         return response

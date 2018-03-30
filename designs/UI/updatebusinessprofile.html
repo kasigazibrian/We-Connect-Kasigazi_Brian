@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Business Update</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="index.html">We Connect!</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="catalogpage.html">Registered businesses</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Update Business Profile</h1>
+    <form>
+
+        <div class="col-sm-9">
+            <label  for="business_name" >Business Name:</label>
+            <input id="business_name" type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+        </div>
+        <br>
+        <div class="col-sm-9">
+            <label for="business_location"   >Business Location:</label>
+            <input id="business_location" type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+        </div>
+        <br>
+        <div class="col-sm-9">
+            <label for="business_email" >Business Email:</label>
+            <input id="business_email" type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+        </div>
+        <div class="col-sm-9">
+            <label for="contactnumber" >Contact Number:</label>
+            <input id="contactnumber" type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+        </div>
+
+        <div class="col-sm-9">
+            <label for="business_nominal_capital">Business Nominal Capital(UGX):</label>
+            <input id="business_nominal_capital" type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+        </div>
+        <br>
+        <div class="col-sm-6">
+            <label for="businesscategory" >Business Category :</label>
+            <div class="dropdown">
+
+                <select id="businesscategory">
+                    <option class="dropdown-item">Entertainment</option>
+                    <option class="dropdown-item">Real Estate</option>
+                    <option class="dropdown-item">Education</option>
+                    <option class="dropdown-item">Health and Medicine</option>
+                    <option class="dropdown-item">Computers & Electronics</option>
+                </select>
+
+            </div>
+        </div>
+            <br>
+            <div class="col-sm-9">
+                <button style="border-radius: 20px; margin-bottom: 5px" class="btn btn-lg btn-primary btn-block" type="submit">Update</button>
+            </div>
+
+    </form>
+</div>
+<script src="../static/js/jquery-3.2.1.min.js"></script>
+<script  src="../static/js/bootstrap.bundle.min.js"></script>
+<script  src="../static/js/bootstrap.min.js"></script>
+</body>
+</html>

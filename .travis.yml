@@ -5,12 +5,15 @@ cache: pip
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install coveralls
+  - pip install coverage
+  - pip install nosexcover
 
 # command to run tests
 script:
-  - nosetests tests/test_user.py
-  - nosetests tests/test_business.py
-  - nosetests tests/test_review.py
+  - nosetests --with-coverage tests/test_user.py
+  - nosetests --with-coverage tests/test_business.py
+  - nosetests --with-coverage tests/test_review.py
 
 after_success:
   -coverage report

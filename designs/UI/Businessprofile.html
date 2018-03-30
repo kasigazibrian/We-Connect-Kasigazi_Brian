@@ -1,0 +1,63 @@
+<!--business profile page-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Business Profile</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="index.html">We Connect!</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="updatebusinessprofile.html">Edit business</a>
+            </li>
+            <li>
+                <a class="nav-link" href="#">Delete business</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="container">
+  <form method="post">
+        <div class="col-sm-5">
+            <h1>BUSINESS PROFILE</h1>
+            <label id="business_name" for="business_name" >Business Name:</label><br>
+          <label for="business_name" ><b>Supercom</b></label>
+      </div>
+       <div class="col-sm-5">
+            <label id="business_location" for="business_location" >Business Location:</label><br>
+          <label for="business_location" ><b>Kampala Uganda</b></label>
+      </div>
+       <div class="col-sm-5">
+            <label id="business_email" for="business_email" >Business Email:</label><br>
+          <label for="business_email" ><b>supercom@gmail.com</b></label>
+      </div>
+       <div class="col-sm-5">
+            <label id="business_category" for="business_category" >Business Category:</label><br>
+          <label for="business_category" ><b>Electronics & Computers</b></label>
+       </div>
+      <div class="col-sm-5">
+            <label id="contactnumber" for="contactnumber" >Contact Number:</label><br>
+          <label for="contactnumber" ><b>+256781712929</b></label>
+      </div>
+      <div class="col-sm-5">
+            <label id="business_nominal_capital" for="business_nominal_capital">Business Nominal Capital(UGX):</label><br>
+          <label for="business_nominal_capital"><b>200000 UGX</b></label>
+      </div>
+      <div class="col-sm-5">
+        <lable>Business Review:</lable><br>
+        <textarea class="form-control" id="businessreview"></textarea><br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">ADD REVIEW</button>
+      </div>
+  </form>
+</div>
+</body>
+</html>

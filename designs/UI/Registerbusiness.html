@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Business Registration</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="index.html">We Connect!</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="catalogpage.html">Registered businesses</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="col-sm-6">
+        <h1>Business Registration Form</h1>
+    </div>
+<form>
+
+    <div class="col-sm-5">
+        <label   >Business Name:</label>
+        <input type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+    </div>
+    <br>
+    <div class="col-sm-5">
+        <label   >Business Location:</label>
+        <input type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+    </div>
+    <br>
+    <div class="col-sm-5">
+        <label >Business Email:</label>
+        <input type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+    </div>
+    <div class="col-sm-5">
+        <label >Contact Number:</label>
+        <input type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+    </div>
+
+    <div class="col-sm-5">
+        <label >Business Nominal Capital(UGX) :</label>
+        <input type="text" style="border-radius: 20px" class="form-control" required="true"></input>
+    </div>
+    <br>
+    <div class="col-sm-5">
+        <label >Business Category :</label>
+        <div class="dropdown">
+
+             <select id="businesscategory">
+                <option class="dropdown-item">Entertainment</option>
+                <option class="dropdown-item">Real Estate</option>
+                <option class="dropdown-item">Education</option>
+                <option class="dropdown-item">Health and Medicine</option>
+                <option class="dropdown-item">Computers & Electronics</option>
+            </select>
+
+        </div>
+    </div>
+    <br>
+        <div class="col-sm-5">
+            <button style="border-radius: 20px" class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+        </div>
+
+    </div>
+
+</form>
+</div>
+<script src="../static/js/jquery-3.2.1.min.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+<script  src="../static/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>
