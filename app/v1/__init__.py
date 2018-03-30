@@ -1,10 +1,10 @@
 from flask import Flask
-from flask_restful import Api
+from flask_restplus import Api
 
 
 app = Flask(__name__)
 
-app.config.from_pyfile("../../config.py")
+app.config.from_object('config.DevelopmentConfig')
 
 api = Api(app)
 
