@@ -39,24 +39,24 @@ class User(db.Model):
                 if user.login_status is False:
                     if check_password_hash(user.password, password):
                         token = jwt.encode(
-                            {'username': user.username, 'exp': datetime.utcnow() + timedelta(minutes=2)},
+                            {'username': user.username, 'exp': datetime.utcnow() + timedelta(minutes=60)},
                             app.config['SECRET_KEY'])
                         decoded_token = token.decode('utf-8')
                         result =Token.add_token(token=decoded_token, token_owner_id=user.user_id)
                         if result=="added":
                             user.login_status = True
                             db.session.commit()
-                            return jsonify({'token': decoded_token, 'message': 'You have successfully logged in'})
+                            return {'token': decoded_token, 'message': 'You have successfully logged in'}, 201
                         else:
-                            return jsonify({"message":"Database error. Please contact administrator"})
+                            return {"message":"Database error. Please contact administrator"}, 400
                     else:
-                        return jsonify({'message':"Your username or password is incorrect"})
+                        return {'message':"Your username or password is incorrect"}, 400
                 else:
-                    return jsonify({"message":"You are currently logged in."})
+                    return {"message": "You are currently logged in."}, 401
             else:
-                return jsonify({"message":"User not found. Please register"})
+                return {"message":"User not found. Please register"}, 400
         else:
-            return jsonify({"message":"Both username and password are required"})
+            return {"message":"Both username and password are required"}, 400
 
     @staticmethod
     def add_user(user_data):
@@ -64,10 +64,10 @@ class User(db.Model):
         try:
             db.session.add(user_data)
             db.session.commit()
-            return jsonify({'message': 'User added successfully'})
+            return {'message': 'User '+ user_data.first_name+' has been added successfully'}, 201
         except exc.IntegrityError:
             db.session.rollback()
-            return jsonify({'message': 'An error occurred. Please contact administrator'})
+            return {'message': 'An error occurred. Please contact administrator'}, 400
 
     @staticmethod
     def is_valid_email(email):
@@ -90,9 +90,9 @@ class User(db.Model):
         if user:
             user.password = password
             db.session.commit()
-            return jsonify({"message":"Password has been reset successfully"})
+            return {"message":"Password has been reset successfully"}, 201
         else:
-            return jsonify({'message': 'User not found'})
+            return {'message': 'User not found'}, 400
 
 
 class Business(db.Model):
@@ -102,7 +102,7 @@ class Business(db.Model):
     business_name = db.Column(db.VARCHAR(100), nullable=False, unique=True)
     business_email = db.Column(db.VARCHAR(100), unique=True)
     business_location = db.Column(db.VARCHAR(150), nullable=False)
-    business_nominal_capital = db.Column(db.FLOAT)
+    contact_number = db.Column(db.VARCHAR(15))
     business_category = db.Column(db.VARCHAR(150))
     business_review = db.relationship('BusinessReviews', backref='review_owner', lazy='dynamic')
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
@@ -111,13 +111,13 @@ class Business(db.Model):
         onupdate=db.func.current_timestamp())
 
     def __init__(self, business_owner_id, business_name,business_email, business_location,
-                 business_nominal_capital, business_category):
+                 contact_number, business_category):
         """initialise a business"""
         self.business_owner_id = business_owner_id
         self.business_name = business_name
         self.business_email = business_email
         self.business_location = business_location
-        self.business_nominal_capital = business_nominal_capital
+        self.contact_number = contact_number
         self.business_category = business_category
 
     @staticmethod
@@ -126,10 +126,10 @@ class Business(db.Model):
         try:
             db.session.add(business_data)
             db.session.commit()
-            return jsonify({'message': 'Business has been registered successfully'})
+            return {'message': 'Business has been registered successfully'}, 201
         except exc.IntegrityError:
             db.session.rollback()
-            return jsonify({'message':'An error occurred. Please contact administrator '})
+            return {'message':'An error occurred. Please contact administrator '}, 500
 
     @staticmethod
     def delete_business( business_id, user_id):
@@ -164,11 +164,11 @@ class Business(db.Model):
             business_data['business_name'] = business.business_name
             business_data['business_email'] = business.business_email
             business_data['business_location'] = business.business_location
-            business_data['business_nominal_capital'] = business.business_nominal_capital
+            business_data['contact_number'] = business.contact_number
             business_data['business_category'] = business.business_category
             return jsonify({'Business': business_data})
         else:
-            return jsonify({'message': 'Business does not exist'})
+            return {'message': 'Business does not exist'}, 400
 
     @staticmethod
     def get_all_businesses():
@@ -183,7 +183,7 @@ class Business(db.Model):
                 business_data['business_name'] = business.business_name
                 business_data['business_email'] = business.business_email
                 business_data['business_location'] = business.business_location
-                business_data['business_nominal_capital'] = business.business_nominal_capital
+                business_data['contact_number'] = business.contact_number
                 business_data['business_category'] = business.business_category
                 registered_businesses.append(business_data)
             return jsonify({'Businesses': registered_businesses})
@@ -197,7 +197,7 @@ class Business(db.Model):
 
     @staticmethod
     def update_business(business_id, current_user, business_name, business_email, business_location,
-                        business_nominal_capital,business_category):
+                        contact_number, business_category):
         business = Business.query.filter_by(business_id=business_id).first()
         if business:
             relation = User.query.filter_by(user_id=current_user.user_id).first()
@@ -216,8 +216,8 @@ class Business(db.Model):
                     if business_location:
                         business.business_location = business_location
                         db.session.commit()
-                    if business_nominal_capital:
-                        business.business_nominal_capital = business_nominal_capital
+                    if contact_number:
+                        business.contact_number = contact_number
                         db.session.commit()
                     if business_category:
                         business.business_category = business_category
@@ -228,7 +228,7 @@ class Business(db.Model):
             else:
                 return jsonify({'messsage': 'Not enough privilege to perform action'})
         else:
-            return jsonify({'message': 'Business not found'})
+            return {'message': 'Business not found'}, 400
 
 
 class BusinessReviews(db.Model):
@@ -246,10 +246,10 @@ class BusinessReviews(db.Model):
         try:
             db.session.add(review_data)
             db.session.commit()
-            return jsonify({'message': 'Review has been added successfully'})
+            return {'message': 'Review has been added successfully'}, 201
         except:
             db.session.rollback()
-            return jsonify({'message': 'An error occurred. Please contact administrator '})
+            return {'message': 'An error occurred. Please contact administrator '}, 500
 
     @staticmethod
     def get_all_reviews( business_id):
@@ -259,11 +259,11 @@ class BusinessReviews(db.Model):
             for my_review in all_reviews:
                 review_data = {}
                 review_data['business_id'] = my_review.business_id
-                review_data['business_owner_id'] = my_review.review
+                review_data['review'] = my_review.review
                 reviews_added.append(review_data)
-            return jsonify({'Businesses': reviews_added})
+            return {'Businesses': reviews_added}, 200
         else:
-            return jsonify({'message': 'No business reviews have been added yet'})
+            return {'message': 'No business reviews have been added yet'}, 400
 
 
 class Token(db.Model):
@@ -287,18 +287,21 @@ class Token(db.Model):
             my_token = Token.query.filter_by(token=token).first()
             my_token.blacklist = True
             db.session.commit()
-            return jsonify({'message':'You have successfully logged out'})
+            return {'message':'You have successfully logged out'}, 201
         except exc.ArgumentError:
             db.session.rollback()
-            return jsonify({'message':'Error accessing database'})
+            return {'message':'Error accessing database'}, 500
 
     @staticmethod
     def check_blacklisted_token(token):
         my_token = Token.query.filter_by(token=token).first()
-        if my_token.blacklist is True:
-            return True
+        if my_token:
+            if my_token.blacklist is True:
+                return True
+            else:
+                return False
         else:
-            return False
+            return {'message': 'Token error'}
 
     @staticmethod
     def add_token(token, token_owner_id):
