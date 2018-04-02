@@ -10,7 +10,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-
+    SWAGGER_UI_JSONEDITOR = True
     # Database URI
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:brian@localhost/weconnect'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
