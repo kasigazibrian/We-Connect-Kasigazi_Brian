@@ -6,16 +6,16 @@ def search_by_name(business_name):
     """search for business based on its name"""
     business_search_result = Business.query.filter_by(business_name=business_name).first()
     if business_search_result:
-        return jsonify({"business_name": business_search_result.business_name,
-                        "business_email": business_search_result.business_email,
-                        "business_location": business_search_result.business_location,
-                        "business_nominal_capital": business_search_result.business_nominal_capital,
-                        "business_category": business_search_result.business_category,
-                        "business_id": business_search_result.business_id,
-                        "business_owner_id": business_search_result.business_owner_id
-                        })
+        return {"business_name": business_search_result.business_name,
+                "business_email": business_search_result.business_email,
+                "business_location": business_search_result.business_location,
+                "contact_number": business_search_result.contact_number,
+                "business_category": business_search_result.business_category,
+                "business_id": business_search_result.business_id,
+                "business_owner_id": business_search_result.business_owner_id
+                }, 200
     else:
-        return jsonify({"message": "Business has not been found"})
+        return {"message": "Business has not been found"}, 400
 
 
 def search_by_category(business_category):
@@ -30,12 +30,12 @@ def search_by_category(business_category):
             business_data['business_name'] = business.business_name
             business_data['business_email'] = business.business_email
             business_data['business_location'] = business.business_location
-            business_data['business_nominal_capital'] = business.business_nominal_capital
+            business_data['contact_number'] = business.contact_number
             business_data['business_category'] = business.business_category
             registered_businesses.append(business_data)
-        return jsonify({'Businesses': registered_businesses})
+        return {'Businesses': registered_businesses}, 200
     else:
-        return jsonify({"message": "Business has not been found"})
+        return {"message": "Business has not been found"}, 400
 
 
 def search_by_location(business_location):
@@ -50,19 +50,20 @@ def search_by_location(business_location):
             business_data['business_name'] = business.business_name
             business_data['business_email'] = business.business_email
             business_data['business_location'] = business.business_location
-            business_data['business_nominal_capital'] = business.business_nominal_capital
+            business_data['contact_number'] = business.contact_number
             business_data['business_category'] = business.business_category
             registered_businesses.append(business_data)
-        return jsonify({'Businesses': registered_businesses})
+        return {'Businesses': registered_businesses}, 200
     else:
-        return jsonify({"message": "Business has not been found"})
+        return {"message": "Business has not been found"}, 400
 
 
 def search_by_location_and_category(business_location, business_category):
     """search for business based on location and category"""
     business_search_result = Business.query.filter_by(business_location=business_location).all()
     if business_search_result:
-        search_result = [business for business in business_search_result if business.business_category == business_category]
+        search_result = [business for business in business_search_result
+                         if business.business_category == business_category]
         if search_result:
             registered_businesses = []
             for business in search_result:
@@ -72,14 +73,112 @@ def search_by_location_and_category(business_location, business_category):
                 business_data['business_name'] = business.business_name
                 business_data['business_email'] = business.business_email
                 business_data['business_location'] = business.business_location
-                business_data['business_nominal_capital'] = business.business_nominal_capital
+                business_data['contact_number'] = business.contact_number
                 business_data['business_category'] = business.business_category
                 registered_businesses.append(business_data)
-            return jsonify({'Businesses': registered_businesses})
+            return {'Businesses': registered_businesses}, 200
         else:
-            return jsonify({"message": "Business has not been found"})
+            return {"message": "Business has not been found"}, 400
     else:
-        return jsonify({"message": "Business has not been found"})
+        return {"message": "Business has not been found"}, 400
 
 
+def search_by_category_and_limit(business_category, limit):
+    """Search for business based on category"""
+    business_search_result = Business.query.filter_by(business_category=business_category)
+    if business_search_result:
+        try:
+            my_limit = int(limit)
+            my_result = business_search_result.paginate(per_page=my_limit, page=1, error_out=True).items
+            registered_businesses = []
+            for business in my_result:
+                business_data = {}
+                business_data['business_id'] = business.business_id
+                business_data['business_owner_id'] = business.business_owner_id
+                business_data['business_name'] = business.business_name
+                business_data['business_email'] = business.business_email
+                business_data['business_location'] = business.business_location
+                business_data['contact_number'] = business.contact_number
+                business_data['business_category'] = business.business_category
+                registered_businesses.append(business_data)
+            return {'Businesses': registered_businesses}, 200
+        except ValueError:
+            return {"message": "Make sure the limit is a valid integer value"}, 400
+    else:
+        return {"message": "Business has not been found"}, 400
 
+
+def search_by_location_and_limit(business_location, limit):
+    """search for business based on location"""
+    business_search_result = Business.query.filter_by(business_location=business_location)
+    if business_search_result:
+        try:
+            my_limit = int(limit)
+            my_result = business_search_result.paginate(page=1, per_page=my_limit, error_out=True).items
+            registered_businesses = []
+            for business in my_result:
+                business_data = {}
+                business_data['business_id'] = business.business_id
+                business_data['business_owner_id'] = business.business_owner_id
+                business_data['business_name'] = business.business_name
+                business_data['business_email'] = business.business_email
+                business_data['business_location'] = business.business_location
+                business_data['contact_number'] = business.contact_number
+                business_data['business_category'] = business.business_category
+                registered_businesses.append(business_data)
+            return {'Businesses': registered_businesses}, 200
+        except ValueError:
+            return {"message": "Make sure the limit is a valid integer value"}, 400
+    else:
+        return {"message": "Business has not been found"}, 400
+
+
+def search_by_location_and_category_and_limit(business_location, business_category, limit):
+    """search for business based on location and category"""
+    business_search_result = Business.query.filter_by(business_location=business_location)
+    if business_search_result:
+        search_result = business_search_result.filter_by(business_category=business_category)
+        if search_result:
+            try:
+                my_limit = int(limit)
+                my_result = search_result.paginate(per_page=my_limit, page=1, error_out=True).items
+                registered_businesses = []
+                for business in my_result:
+                    business_data = {}
+                    business_data['business_id'] = business.business_id
+                    business_data['business_owner_id'] = business.business_owner_id
+                    business_data['business_name'] = business.business_name
+                    business_data['business_email'] = business.business_email
+                    business_data['business_location'] = business.business_location
+                    business_data['contact_number'] = business.contact_number
+                    business_data['business_category'] = business.business_category
+                    registered_businesses.append(business_data)
+                return {'Businesses': registered_businesses}, 200
+            except ValueError:
+                return {'message': 'Make sure the limit is a valid integer value'}, 400
+        else:
+            return {"message": "Business has not been found"}, 400
+    else:
+        return {"message": "Business has not been found"}, 400
+
+
+def search_by_limit(limit):
+        """Get all businesses"""
+        try:
+            my_limit= int(limit)
+            businesses = Business.query.paginate(per_page=my_limit, page=1, error_out=True).items
+            if businesses:
+                registered_businesses = []
+                for business in businesses:
+                    business_data = {}
+                    business_data['business_id'] = business.business_id
+                    business_data['business_owner_id'] = business.business_owner_id
+                    business_data['business_name'] = business.business_name
+                    business_data['business_email'] = business.business_email
+                    business_data['business_location'] = business.business_location
+                    business_data['contact_number'] = business.contact_number
+                    business_data['business_category'] = business.business_category
+                    registered_businesses.append(business_data)
+                return {'Businesses': registered_businesses}, 200
+        except ValueError:
+            return {"message": "Make sure the limit is a valid integer value"}, 400
