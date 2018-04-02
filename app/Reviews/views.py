@@ -1,33 +1,39 @@
-from flask import request, jsonify
-from flask_restful import Resource
-from app.app import  api
+"""Views.py Reviews"""
+from flask_restplus import Resource, fields
+from app.app import api
 from app.models import BusinessReviews, Business
 
+review_model = api.model('Review', {'review': fields.String('Business Review')})
 
-class GetAllBusinessReviews(Resource):
+review_out_model = api.model('Review_out', {'review': fields.String('Business review'),
+                                            'business_id': fields.String('Business ID')})
+
+
+class BusinessReviewsOperations(Resource):
+    @api.doc(responses={400: 'Bad Request', 200: 'Success', 201: 'Created', 401: 'Unauthorised', 500: 'Database Error'})
     def get(self,business_id):
-        """get all business reviews"""
+        """Method to get all business reviews"""
         all_reviews = BusinessReviews.get_all_reviews(business_id=business_id)
         return all_reviews
 
-
-class AddBusinessReview(Resource):
+    @api.doc(responses={400: 'Bad Request', 200: 'Success', 201: 'Created', 401: 'Unauthorised', 500: 'Database Error'})
+    @api.expect(review_model)
     def post(self, business_id):
-        new_review_data = request.get_json(force=True)
+        """Method to add a business review"""
+        new_review_data = api.payload
         review = new_review_data.get('review')
         if review:
-            mybusiness = Business.query.filter_by(business_id=business_id).first()
-            if mybusiness:
+            my_business = Business.query.filter_by(business_id=business_id).first()
+            if my_business:
                 new_business_review = BusinessReviews(review=review, business_id=business_id)
                 add_business_review = BusinessReviews.add_review(new_business_review)
-                add_business_review.status_code = 201
                 return add_business_review
             else:
-                return jsonify({"message":"Business to add a review to does not exist. Please ensure"
-                                          " that you have indicated the correct business id"})
+                return {"message": "Business to add a review to does not exist. Please ensure"
+                                   " that you have indicated the correct business id"}, 400
         else:
-            return jsonify({"message": "No Review has been added"})
+            return {"message": "No Review has been added"}, 400
 
 
-api.add_resource(GetAllBusinessReviews,'/api/v2/businesses/<business_id>/reviews')
-api.add_resource(AddBusinessReview,'/api/v2/businesses/<business_id>/reviews')
+api.add_resource(BusinessReviewsOperations, '/api/v2/businesses/<business_id>/reviews')
+
