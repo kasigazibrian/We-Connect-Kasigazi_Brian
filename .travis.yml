@@ -16,7 +16,7 @@ before_script:
 # command to run tests
 script:
   - pytest
-  - coverage run manage.py test
+  - coverage run --source='.' manage.py test
   - coverage report
 
 after_script:
