@@ -23,6 +23,6 @@ after_script:
   - codeclimate-test-reporter
 
 after_success:
-  -coveralls
+  - coveralls
   #upload reports to coveralls.io
 
