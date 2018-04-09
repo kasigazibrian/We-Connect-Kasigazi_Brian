@@ -4,6 +4,7 @@ from app.app import app, api
 from werkzeug.security import generate_password_hash
 from app.models import User, Token, db
 import jwt
+from app.models import db
 from functools import wraps
 
 authorizations = {'api_key':{

@@ -15,12 +15,14 @@ before_script:
 
 # command to run tests
 script:
-  - py.test testsv2/test_user.py
-  - py.test testsv2/test_business.py
-  - py.test testsv2/test_review.py
+  - pytest
+  - coverage run manage.py test
+  - coverage report
+
+after_script:
+  - codeclimate-test-reporter
 
 after_success:
-  -coverage report
   -coveralls
   #upload reports to coveralls.io
 

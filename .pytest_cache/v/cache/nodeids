@@ -1,5 +1,0 @@
-[
-  "testsv2/test_review.py::FlaskTestCase::test_API_can_get_all_reviews",
-  "testsv2/test_review.py::FlaskTestCase::test_API_can_not_add_review_to_a_business_which_is_non_existent",
-  "testsv2/test_review.py::FlaskTestCase::test_API_can_post_reviews"
-]
