@@ -74,18 +74,12 @@ class Register(Resource):
     def post(self):
         """Method to register a user"""
         new_user = api.payload
-        if 'username' in new_user:
-            username = new_user['username']
-        if 'password' in new_user:
-            password = new_user['password']
-        if 'first_name' in new_user:
-            first_name = new_user['first_name']
-        if 'last_name' in new_user:
-            last_name = new_user['last_name']
-        if 'email' in new_user:
-            email = new_user['email']
-        if 'gender' in new_user:
-            gender = new_user['gender']
+        username = new_user.get('username')
+        password = new_user.get('password')
+        first_name = new_user.get('first_name')
+        last_name = new_user.get('last_name')
+        email = new_user.get('email')
+        gender = new_user.get('gender')
         if username and password and first_name and last_name and email and gender:
             if User.is_valid_email(email) is True:
                 if User.is_valid_gender(gender) is True:
