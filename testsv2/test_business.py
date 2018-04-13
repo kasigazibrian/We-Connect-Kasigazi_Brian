@@ -157,6 +157,31 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("Not a valid email", str(response.data))
 
+    def test_API_business_phone_number_validation_constraint(self):
+        """Tests if a business is created"""
+        tester = app.test_client(self)
+        response = tester.post("/api/v2/auth/register", data=json.dumps(self.test_user),
+                               content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('User ' + self.test_user['first_name'] + ' has been added successfully', str(response.data))
+        # Then log in the user
+        user_login = {"username": 'moses', "password": "mango"}
+        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('You have successfully logged in', str(response.data))
+        result_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.businesses[0]),
+                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("Business has been registered successfully", str(response.data))
+        self.businesses[0]["business_name"] = "Wakanda"
+        self.businesses[0]["business_email"] = "wakanda@gmail.com"
+        self.businesses[0]["contact_number"] ="sdhgsh"
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.businesses[0]),
+                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("Not a valid phone number. Ensure it has ten digits", str(response.data))
+
     def test_API_can_obtain_a_specific_business(self):
         """Tests if one can retrieve a specific business"""
         tester = app.test_client(self)
