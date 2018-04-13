@@ -84,6 +84,13 @@ class User(db.Model):
             return False
 
     @staticmethod
+    def is_valid_phone_number(phone_number):
+        if re.match(r"^\d{12}$", phone_number):
+            return True
+        else:
+            return False
+        
+    @staticmethod
     def password_reset(current_user, password):
         """reset user password"""
         user = User.query.filter_by(user_id=current_user.user_id).first()
@@ -191,6 +198,13 @@ class Business(db.Model):
     @staticmethod
     def is_valid_email(email):
         if re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def is_valid_phone_number(phone_number):
+        if re.match(r"^\d{12}$", phone_number):
             return True
         else:
             return False
