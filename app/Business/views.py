@@ -45,21 +45,24 @@ class Businesses(Resource):
         business_owner_id = current_user.user_id
         if business_name and business_category and business_location and business_email and contact_number:
             if Business.is_valid_email(business_email) is True:
-                my_business = Business.query.filter_by(business_name=business_name).first()
-                if not my_business:
-                    my_business_email = Business.query.filter_by(business_email=business_email).first()
-                    if not my_business_email:
-                        new_business = Business(business_owner_id=business_owner_id, business_name=business_name,
-                                                business_email=business_email, business_location=business_location,
-                                                contact_number=contact_number,
-                                                business_category=business_category)
+                if Business.is_valid_phone_number(contact_number):
+                    my_business = Business.query.filter_by(business_name=business_name).first()
+                    if not my_business:
+                        my_business_email = Business.query.filter_by(business_email=business_email).first()
+                        if not my_business_email:
+                            new_business = Business(business_owner_id=business_owner_id, business_name=business_name,
+                                                    business_email=business_email, business_location=business_location,
+                                                    contact_number=contact_number,
+                                                    business_category=business_category)
 
-                        response = new_business.register_business(new_business)
-                        return response
+                            response = new_business.register_business(new_business)
+                            return response
+                        else:
+                            return {"message": "Email already exists"}, 400
                     else:
-                        return {"message": "Email already exists"}, 400
+                        return {"message": "Business already exists"}, 400
                 else:
-                    return {"message": "Business already exists"}, 400
+                    return {"message": "Not a valid phone number. Ensure it has ten digits"}
             else:
                 return {"message": "Not a valid email address"}, 400
         else:
