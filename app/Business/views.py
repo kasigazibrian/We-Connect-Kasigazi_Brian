@@ -62,7 +62,7 @@ class Businesses(Resource):
                     else:
                         return {"message": "Business already exists"}, 400
                 else:
-                    return {"message": "Not a valid phone number. Ensure it has ten digits"}
+                    return {"message": "Not a valid phone number. Ensure it has ten digits"}, 400
             else:
                 return {"message": "Not a valid email address"}, 400
         else:
