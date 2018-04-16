@@ -26,7 +26,27 @@ class BaseTestCase(TestCase):
         }
         self.reviews = [{"review": "This business is awesome"}, {"review": "This business rocks"},
                        {"review": "They have poor customer care"}]
-        # db.session.commit()
+
+    def register(self):
+        tester = app.test_client(self)
+        response = tester.post("/api/v2/auth/register", data=json.dumps(self.test_user),
+                               content_type="application/json")
+        return response
+
+    def login(self):
+        user = {"username": 'moses', "password": "mango"}
+        response = self.client.post("/api/v2/login", data=json.dumps(user), content_type="application/json")
+        return response
+
+    def register_business(self, json_result):
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.business),
+                                    headers={"access-token": json_result["token"]}, content_type="application/json")
+        return response
+
+    def add_review(self, review):
+        response = self.client.post("/api/v2/businesses/1/reviews", data=json.dumps(review),
+                               content_type="application/json")
+        return response
 
     def tearDown(self):
         db.session.remove()
@@ -35,75 +55,55 @@ class BaseTestCase(TestCase):
 
 class FlaskTestCase(BaseTestCase):
     """This class represents the flask test cases"""
-    def test_API_can_post_reviews(self):
+    def test_adding_review(self):
         """Tests if a business review is added"""
-        tester = app.test_client(self)
         # Add a test user
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.test_user),
-                               content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.test_user['first_name'] + ' has been added successfully', str(response.data))
-        # Then log in the user
-        user_login = {"username": 'moses', "password": "mango"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
-        result_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
-        # Then register the business using the token after logging in
-        response = self.client.post("/api/v2/businesses", data=json.dumps(self.business),
-                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        self.assertIn("Business has been registered successfully", str(response.data))
-        response = tester.post("/api/v2/businesses/1/reviews", data=json.dumps(self.reviews[0]),
-                               content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        # check for review added message
-        self.assertIn('Review has been added successfully', str(response.data))
 
-    def test_API_can_not_add_review_to_a_business_which_is_non_existent(self):
+        # Then log in the user
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        # Then register the business using the token after logging in
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.add_review(self, self.reviews[0])
+        self.assertEqual(response.status_code, 201)
+
+    def test_invalid_business(self):
         """Tests if a review can be added to a non existent business"""
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/businesses/1/reviews", data=json.dumps(self.reviews[0]),
-                               content_type="application/json")
+        response = BaseTestCase.add_review(self, self.reviews[0])
         self.assertEqual(response.status_code, 400)
-        # check for review content
-        self.assertIn("Business to add a review to does not exist. Please ensure "
-                      "that you have indicated the correct business id", str(response.data))
 
     def test_API_can_get_all_reviews(self):
         """Tests if api can get all reviews"""
-        tester = app.test_client(self)
         # Add a test user
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.test_user),
-                               content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.test_user['first_name'] + ' has been added successfully', str(response.data))
-        # Then log in the user
-        user_login = {"username": 'moses', "password": "mango"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
-        result_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
-        # Then register the business using the token after logging in
-        response = self.client.post("/api/v2/businesses", data=json.dumps(self.business),
-                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        self.assertIn("Business has been registered successfully", str(response.data))
-        response= tester.post("/api/v2/businesses/1/reviews", data= json.dumps(self.reviews[0]),
-                              content_type="application/json")
-        self.assertIn('Review has been added successfully', str(response.data))
-        response = tester.post("/api/v2/businesses/1/reviews", data=json.dumps(self.reviews[1]),
-                               content_type="application/json")
-        self.assertIn('Review has been added successfully', str(response.data))
-        response = tester.post("/api/v2/businesses/1/reviews", data=json.dumps(self.reviews[2]),
-                               content_type="application/json")
-        self.assertIn('Review has been added successfully', str(response.data))
-        response = tester.get("/api/v2/businesses/1/reviews")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('This business is awesome', str(response.data))
-        self.assertIn('This business rocks', str(response.data))
-        self.assertIn('They have poor customer care', str(response.data))
 
+        # Then log in the user
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        # Then register the business using the token after logging in
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.add_review(self, self.reviews[0])
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.add_review(self, self.reviews[1])
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.add_review(self, self.reviews[2])
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get("/api/v2/businesses/1/reviews")
+        self.assertEqual(response.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()
