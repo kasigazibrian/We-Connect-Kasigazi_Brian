@@ -36,8 +36,8 @@ class User(db.Model):
         if username and password:
             user = User.query.filter_by(username=username).first()
             if user:
-                if user.login_status is False:
-                    if check_password_hash(user.password, password):
+                if check_password_hash(user.password, password):
+                    if user.login_status is False:
                         token = jwt.encode(
                             {'username': user.username, 'exp': datetime.utcnow() + timedelta(minutes=60)},
                             app.config['SECRET_KEY'])
@@ -46,17 +46,25 @@ class User(db.Model):
                         if result=="added":
                             user.login_status = True
                             db.session.commit()
-                            return {'token': decoded_token, 'message': 'You have successfully logged in'}, 201
+                            return {'token': decoded_token,
+                                    'message': 'You have successfully logged in',
+                                    'username': user.username,
+                                    'email': user.email,
+                                    'first_name': user.first_name,
+                                    'last_name': user.last_name,
+                                    'gender': user.gender,
+                                    'status': 'Success'
+                                    }, 201
                         else:
-                            return {"message":"Database error. Please contact administrator"}, 400
+                            return {"message":"Database error. Please contact administrator", "status": "Fail"}, 400
                     else:
-                        return {'message':"Your username or password is incorrect"}, 400
+                        return {"message": "You are currently logged in.", "status": "Fail"}, 401
                 else:
-                    return {"message": "You are currently logged in."}, 401
+                    return {'message': "Your username or password is incorrect", "status": "Fail"}, 400
             else:
-                return {"message":"User not found. Please register"}, 400
+                return {"message": "User not found. Please register", "status": "Fail"}, 400
         else:
-            return {"message":"Both username and password are required"}, 400
+            return {"message": "Both username and password are required", "status": "Fail"}, 400
 
     @staticmethod
     def add_user(user_data):
@@ -64,10 +72,10 @@ class User(db.Model):
         try:
             db.session.add(user_data)
             db.session.commit()
-            return {'message': 'User '+ user_data.first_name+' has been added successfully'}, 201
+            return {'message': 'User '+ user_data.first_name+' has been added successfully', "status": "Success"}, 201
         except exc.IntegrityError:
             db.session.rollback()
-            return {'message': 'An error occurred. Please contact administrator'}, 400
+            return {'message': 'An error occurred. Please contact administrator', "status": "Fail"}, 400
 
     @staticmethod
     def is_valid_email(email):
@@ -97,9 +105,9 @@ class User(db.Model):
         if user:
             user.password = password
             db.session.commit()
-            return {"message":"Password has been reset successfully"}, 201
+            return {"message":"Password has been reset successfully", "status": "Success"}, 201
         else:
-            return {'message': 'User not found'}, 400
+            return {'message': 'User not found', "status": "Fail"}, 400
 
 
 class Business(db.Model):
@@ -150,15 +158,16 @@ class Business(db.Model):
                     if relation.business_owner_id == user_id:
                         db.session.delete(delete_business)
                         db.session.commit()
-                        return jsonify({"message": "Business has been deleted successfully"})
+                        return {"message": "Business has been deleted successfully", "status": "Success"}, 200
                     else:
-                        return jsonify({'message': 'You do not have enough privileges to delete this business'})
+                        return {'message': 'You do not have enough privileges to delete this business',
+                                "status": "Fail"}, 401
                 else:
-                    return jsonify({'message': 'Business not found'})
+                    return {'message': 'Business not found', "status": "Fail"}, 400
             else:
-                return jsonify({'message': 'You do not have enough privileges to delete this business'})
+                return {'message': 'You do not have enough privileges to delete this business', "status": "Fail"}, 401
         else:
-            return jsonify({'message': 'You do not have enough privileges to delete this business'})
+            return {'message': 'You do not have enough privileges to delete this business', "status": "Fail"}, 401
 
     @staticmethod
     def get_specific_business(business_id):
@@ -173,9 +182,9 @@ class Business(db.Model):
             business_data['business_location'] = business.business_location
             business_data['contact_number'] = business.contact_number
             business_data['business_category'] = business.business_category
-            return jsonify({'Business': business_data})
+            return {'Business': business_data, "status": "Success"}, 200
         else:
-            return {'message': 'Business does not exist'}, 400
+            return {'message': 'Business does not exist', "status": "Fail"}, 400
 
     @staticmethod
     def get_all_businesses():
@@ -193,7 +202,7 @@ class Business(db.Model):
                 business_data['contact_number'] = business.contact_number
                 business_data['business_category'] = business.business_category
                 registered_businesses.append(business_data)
-            return jsonify({'Businesses': registered_businesses})
+            return {'Businesses': registered_businesses, "status": "Success"}, 200
 
     @staticmethod
     def is_valid_email(email):
@@ -223,7 +232,7 @@ class Business(db.Model):
                             business.business_name = business_name
                             db.session.commit()
                         except exc.IntegrityError:
-                            return jsonify({"message": "Business name already exists"})
+                            return {"message": "Business name already exists", "status": "Fail"}, 400
                     if business_email:
                         business.business_email = business_email
                         db.session.commit()
@@ -236,13 +245,13 @@ class Business(db.Model):
                     if business_category:
                         business.business_category = business_category
                         db.session.commit()
-                    return jsonify({'message': 'Business updated successfully'})
+                    return {'message': 'Business updated successfully', "status": "Success"}, 201
                 else:
-                    return jsonify({'messsage': 'Not enough privilege to perform action'})
+                    return {'messsage': 'Not enough privilege to perform action', "status": "Fail"}, 401
             else:
-                return jsonify({'messsage': 'Not enough privilege to perform action'})
+                return {'messsage': 'Not enough privilege to perform action', "status": "Fail"}, 401
         else:
-            return {'message': 'Business not found'}, 400
+            return {'message': 'Business not found', "status": "Fail"}, 400
 
 
 class BusinessReviews(db.Model):
@@ -260,10 +269,10 @@ class BusinessReviews(db.Model):
         try:
             db.session.add(review_data)
             db.session.commit()
-            return {'message': 'Review has been added successfully'}, 201
+            return {'message': 'Review has been added successfully', "status": "Success"}, 201
         except:
             db.session.rollback()
-            return {'message': 'An error occurred. Please contact administrator '}, 500
+            return {'message': 'An error occurred. Please contact administrator ', "status": "Fail"}, 500
 
     @staticmethod
     def get_all_reviews( business_id):
@@ -275,9 +284,9 @@ class BusinessReviews(db.Model):
                 review_data['business_id'] = my_review.business_id
                 review_data['review'] = my_review.review
                 reviews_added.append(review_data)
-            return {'Businesses': reviews_added}, 200
+            return {'Businesses': reviews_added, "status": "Success"}, 200
         else:
-            return {'message': 'No business reviews have been added yet'}, 400
+            return {'message': 'No business reviews have been added yet', "status": "Fail"}, 400
 
 
 class Token(db.Model):
@@ -301,10 +310,10 @@ class Token(db.Model):
             my_token = Token.query.filter_by(token=token).first()
             my_token.blacklist = True
             db.session.commit()
-            return {'message':'You have successfully logged out'}, 201
+            return {'message':'You have successfully logged out', "status": "Success"}, 201
         except exc.ArgumentError:
             db.session.rollback()
-            return {'message':'Error accessing database'}, 500
+            return {'message':'Error accessing database', "status": "Fail"}, 500
 
     @staticmethod
     def check_blacklisted_token(token):
@@ -315,7 +324,7 @@ class Token(db.Model):
             else:
                 return False
         else:
-            return {'message': 'Token error'}
+            return {'message': 'Token error', "status": "Fail"}
 
     @staticmethod
     def add_token(token, token_owner_id):
@@ -328,8 +337,8 @@ class Token(db.Model):
                 return "added"
             except:
                 db.session.rollback()
-                return jsonify({'message': 'Error accessing database'})
+                return {'message': 'Error accessing database', "status": "Fail"}, 500
         else:
-            return jsonify({"message": "Token already exists"})
+            return {"message": "Token already exists", "status": "Fail"}, 400
 
 
