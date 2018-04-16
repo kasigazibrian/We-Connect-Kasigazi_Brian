@@ -31,10 +31,10 @@ def jwt_required(f):
                         my_token.tk_owner.login_status = False
                         my_token.blacklist = True
                         db.session.commit()
-                        return {'message': 'Your session has expired!. Please log in again.'}, 401
+                        return {'message': 'Your session has expired!. Please log in again.', "status": "Fail"}, 401
 
                 else:
-                    return {"message":"Your session has expired!. Please login again"}, 401
+                    return {"message":"Your session has expired!. Please login again", "status": "Fail"}, 401
             else:
                 return {'message': 'Token is missing'}, 401
         else:
@@ -64,7 +64,7 @@ api.authorizations = authorizations
 class Home(Resource):
     def get(self):
         """route to home page"""
-        return {'message':'You are Welcome!'}, 200
+        return {'message':'You are Welcome!', "status": "Success"}, 200
 
 
 class Register(Resource):
@@ -94,16 +94,16 @@ class Register(Resource):
                             response = User.add_user(add_new_user)
                             return response
                         else:
-                            return {"message": "Email address already exists"}, 400
+                            return {"message": "Email address already exists", "status": "Fail"}, 400
                     else:
-                        return {'message': 'User already exists'}, 400
+                        return {'message': 'User already exists', "status": "Fail"}, 400
                 else:
-                    return {'message': 'Invalid gender. Try Male, Female, M, F'}, 400
+                    return {'message': 'Invalid gender. Try Male, Female, M, F', "status": "Fail"}, 400
             else:
-                return {"message": "Not a valid email address"}, 400
+                return {"message": "Not a valid email address", "status": "Fail"}, 400
         else:
             return {'message': 'All fields are required, that is username,'
-                               ' password, first_name, last_name, email and gender'}, 400
+                               ' password, first_name, last_name, email and gender', "status": "Fail"}, 400
 
 
 class Login(Resource):
@@ -119,7 +119,7 @@ class Login(Resource):
             response = User.login(username=username, password=password)
             return response
         else:
-            return {"message": "Both username and password are required"}, 400
+            return {"message": "Both username and password are required", "status": "Fail"}, 400
 
 
 class PasswordReset(Resource):
@@ -138,9 +138,9 @@ class PasswordReset(Resource):
                 response = User.password_reset(current_user, my_new_password)
                 return response
             else:
-                return {'message': 'Please enter the new password'}, 400
+                return {'message': 'Please enter the new password', "status": "Fail"}, 400
         else:
-            return {'message': 'Please enter the new password'}, 400
+            return {'message': 'Please enter the new password', "status": "Fail"}, 400
 
 
 class Logout(Resource):
@@ -155,9 +155,9 @@ class Logout(Resource):
                 response = Token.blacklist_token(token=token, user=current_user.username)
                 return response
             else:
-                return {"message": "Token is missing"}, 401
+                return {"message": "Token is missing", "status": "Fail"}, 401
         else:
-            return {"message": "Please first login to perform the action"}, 401
+            return {"message": "Please first login to perform the action", "status": "Fail"}, 401
 
 
 api.add_resource(Login, '/api/v2/login')
