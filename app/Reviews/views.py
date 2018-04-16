@@ -30,9 +30,9 @@ class BusinessReviewsOperations(Resource):
                 return add_business_review
             else:
                 return {"message": "Business to add a review to does not exist. Please ensure"
-                                   " that you have indicated the correct business id"}, 400
+                                   " that you have indicated the correct business id", "status": "Fail"}, 400
         else:
-            return {"message": "No Review has been added"}, 400
+            return {"message": "No Review has been added", "status": "Fail"}, 400
 
 
 api.add_resource(BusinessReviewsOperations, '/api/v2/businesses/<business_id>/reviews')
