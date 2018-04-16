@@ -24,6 +24,17 @@ class BaseTestCase(TestCase):
             "email": "martin@gmail.com",
             "gender": "male"
         }
+
+    def register(self):
+        tester = app.test_client(self)
+        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user),
+                                   content_type="application/json")
+        return response
+
+    def login(self):
+        user = {"username": 'martin', "password": "banana"}
+        response = self.client.post("/api/v2/login", data=json.dumps(user), content_type="application/json")
+        return response
         # db.session.commit()
 
     def tearDown(self):
@@ -33,181 +44,148 @@ class BaseTestCase(TestCase):
 
 class FlaskTestCase(BaseTestCase):
     """This class represents the flask test cases"""
-    def test_api_can_not_create_user_without_all_fields(self):
+    def test_the_all_fields_constraint(self):
         """Tests if api will fail to create a user if all fields are not provided"""
-        tester = app.test_client(self)
         self.user['first_name'] = ""
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 400)
-        self.assertIn('All fields are required, that is username, password, first_name, last_name,'
-                      ' email and gender', str(response.data))
 
-    def test_api_can_not_create_user_without_a_valid_email(self):
+    def test_for_valid_email(self):
         """Tests if api will fail to create a user if the email provided is not valid"""
         tester = app.test_client(self)
         self.user['email']= "martin"
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Not a valid email address', str(response.data))
 
-    def test_api_can_not_create_user_without_valid_gender(self):
+    def test_for_valid_gender(self):
         """Tests if api will fail to create a user if the email provided is not valid"""
         tester = app.test_client(self)
         self.user['gender'] = 'boy'
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Invalid gender. Try Male, Female, M, F', str(response.data))
 
-    def test_API_can_create_a_user_account(self):
+    def test_creating_a_user_account(self):
         """Tests if a user account is created"""
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User '+self.user['first_name']+' has been added successfully', str(response.data))
 
-    def test_API_can_not_create_a_user_account_twice(self):
+    def test_username_availability(self):
         """Tests if a user account is created only once to show the username unique key constraint works"""
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user),content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User '+self.user['first_name']+' has been added successfully', str(response.data))
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user),content_type="application/json")
-        self.assertEqual(response.status_code, 400)
-        self.assertIn('User already exists', str(response.data))
 
-    def test_API_can_not_create_a_user_account_with_the_same_email(self):
+        response = self.client.post("/api/v2/auth/register", data=json.dumps(self.user),content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_email_availability(self):
         """Tests if a user account is created only once to show the email unique key constraint works"""
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User '+self.user['first_name']+' has been added successfully', str(response.data))
+
         self.user['username']= "moses"
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Email address already exists', str(response.data))
 
-    def test_log_in_post_request_will_fail_without_all_required_credentials(self):
+    def test_the_login_all_fields_constraint(self):
         """Tests if a user can be logged in"""
         # First add the user
-        tester = app.test_client(self)
-        with tester:
-            response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
-            self.assertEqual(response.status_code, 201)
-            self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
-            user_login = {"username": "moses"}
-            response = tester.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
-            self.assertEqual(response.status_code, 400)
-            self.assertIn('Both username and password are required', str(response.data))
-
-    def test_log_in_post_request_will_fail_with_invalid_credentials(self):
-        """Tests if a user can be logged in"""
-        # First add the user
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
-        user_login = {"username": 'martin', "password": "mango"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+
+        user = {"username": "moses"}
+        response = self.client.post("/api/v2/login", data=json.dumps(user), content_type="application/json")
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Your username or password is incorrect', str(response.data))
 
-    def test_log_in_post_request(self):
+    def test_invalid_login(self):
         """Tests if a user can be logged in"""
         # First add the user
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
-        user_login = {"username": 'martin', "password": "banana"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
-        self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
 
-    def test_user_will_not_be_able_to_login_twice(self):
+        user = {"username": 'martin', "password": "mango"}
+        response = self.client.post("/api/v2/login", data=json.dumps(user), content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_login(self):
         """Tests if a user can be logged in"""
         # First add the user
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
-        user_login = {"username": 'martin', "password": "banana"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+
+        response = BaseTestCase.login(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
-        res = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+
+    def test_double_login(self):
+        """Tests if a user can be logged in"""
+        # First add the user
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        response =  BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        res = BaseTestCase.login(self)
         self.assertEqual(res.status_code, 401)
-        self.assertIn('You are currently logged in.', str(res.data))
 
-    def test_password_reset_post_request_will_fail_without_token(self):
+    def test_password_reset_token_required_constraint(self):
         """Tests if password reset will fail without token"""
         new_password = {'password': 'pineapple'}
         response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password),
                                     content_type="application/json")
         self.assertEqual(response.status_code, 401)
-        self.assertIn('Token is missing', str(response.data))
 
-    def test_logout_post_request_will_fail_without_token(self):
+    def test_logout_will_fail_without_token(self):
         """Tests if a user logs out"""
         response = self.client.post("/api/v2/auth/logout")
         self.assertEqual(response.status_code, 401)
-        self.assertIn('Token is missing', str(response.data))
 
-    def test_password_can_be_reset_with_token(self):
+    def test_valid_password_reset(self):
         """Tests that password will be reset when the token is present"""
         # First add the user
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
+
         # Then log in the user
-        user_login = {"username": 'martin', "password": "banana"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+        response = BaseTestCase.login(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
-        result_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
+
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         new_password = {'new_password': 'pineapple'}
         response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password),
-                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 201)
-        self.assertIn('Password has been reset successfully', str(response.data))
 
-    def test_password_can_not_be_reset_with_token_but_no_new_password_provided(self):
+    def test_password_reset_with_no_new_password(self):
         """Tests that password will be reset when the token is present"""
         # First add the user
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
+
         # Then log in the user
-        user_login = {"username": 'martin', "password": "banana"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+        response = BaseTestCase.login(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
-        result_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
+
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         new_password = {'new_password': ''}
         response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password),
-                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 400)
-        self.assertIn('Please enter the new password', str(response.data))
 
-    def test_user_can_logout_with_token(self):
+    def test_valid_logout(self):
         """Tests that password will be reset when the token is preent"""
         # First add the user
-        tester = app.test_client(self)
-        response = tester.post("/api/v2/auth/register", data=json.dumps(self.user), content_type="application/json")
+        response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('User ' + self.user['first_name'] + ' has been added successfully', str(response.data))
+
         # Then log in the user
-        user_login = {"username": 'martin', "password": "banana"}
-        response = self.client.post("/api/v2/login", data=json.dumps(user_login), content_type="application/json")
+        response = BaseTestCase.login(self)
         self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged in', str(response.data))
-        result_in_json = json.loads(response.data.decode('utf-8').replace("'", "\""))
+
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         new_password = {'password': 'pineapple'}
         response = self.client.post("/api/v2/auth/logout", data=json.dumps(new_password),
-                                    headers={"access-token": result_in_json["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 201)
-        self.assertIn('You have successfully logged out', str(response.data))
 
 
 if __name__ == '__main__':
