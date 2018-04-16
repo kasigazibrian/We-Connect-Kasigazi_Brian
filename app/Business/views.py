@@ -58,16 +58,17 @@ class Businesses(Resource):
                             response = new_business.register_business(new_business)
                             return response
                         else:
-                            return {"message": "Email already exists"}, 400
+                            return {"message": "Email already exists", "status": "Fail"}, 400
                     else:
-                        return {"message": "Business already exists"}, 400
+                        return {"message": "Business already exists", "status": "Fail"}, 400
                 else:
-                    return {"message": "Not a valid phone number. Ensure it has ten digits"}, 400
+                    return {"message": "Not a valid phone number. Ensure it has ten digits", "status": "Fail"}, 400
             else:
-                return {"message": "Not a valid email address"}, 400
+                return {"message": "Not a valid email address", "status": "Fail"}, 400
         else:
             return {"message": "All fields are required, that is business_name, business_email,"
-                               "business_location, business_nominal_capital and business_category"}, 400
+                               "business_location, business_nominal_capital and business_category",
+                    "status": "Fail"}, 400
 
     # @api.marshal_with(business_output_model)
     @api.expect(parser)
