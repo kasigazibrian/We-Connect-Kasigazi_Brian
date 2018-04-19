@@ -1,5 +1,4 @@
-from app.models import Business
-from flask import jsonify
+from app.Business.models import Business
 
 
 def search_by_name(business_name):
