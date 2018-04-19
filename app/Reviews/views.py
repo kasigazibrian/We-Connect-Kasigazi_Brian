@@ -1,7 +1,8 @@
 """Views.py Reviews"""
 from flask_restplus import Resource, fields
 from app.app import api
-from app.models import BusinessReviews, Business
+from app.Business.models import Business
+from app.Reviews.models import BusinessReviews
 
 review_model = api.model('Review', {'review': fields.String('Business Review')})
 

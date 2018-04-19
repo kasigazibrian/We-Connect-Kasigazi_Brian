@@ -1,7 +1,7 @@
 from flask import request
 from flask_restplus import Resource, fields, reqparse
 from app.app import api
-from app.models import Business
+from app.Business.models import Business
 from app.Authentication.views import jwt_required
 from app.Authentication.views import authorizations
 from app.Business.search_model import search_by_name, search_by_category,\
