@@ -1,13 +1,13 @@
-from flask import request, jsonify
+from flask import request
 from flask_restplus import Resource, fields
-from app.app import app, api
+from app.app import app, api, db
 from werkzeug.security import generate_password_hash
-from app.models import User, Token, db
+from .models import User
+from app.Authentication.models import Token
 import jwt
-from app.models import db
 from functools import wraps
 
-authorizations = {'api_key':{
+authorizations = {'api_key': {
     'type': 'apiKey',
     'in': 'header',
     'name': 'access-token'
@@ -17,7 +17,7 @@ authorizations = {'api_key':{
 
 def jwt_required(f):
     @wraps(f)
-    def decorated(*args,**kwargs):
+    def decorated(*args, **kwargs):
         token = None
         if 'access-token' in request.headers:
             token = request.headers['access-token']
