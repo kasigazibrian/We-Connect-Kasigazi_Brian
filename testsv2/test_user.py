@@ -1,9 +1,7 @@
 import json
 import unittest
-from app.models import db, User
-from app.app import app
+from app.app import db, app
 from flask_testing import TestCase
-from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class BaseTestCase(TestCase):
@@ -172,7 +170,7 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_valid_logout(self):
-        """Tests that password will be reset when the token is preent"""
+        """Tests that password will be reset when the token is present"""
         # First add the user
         response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)

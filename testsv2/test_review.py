@@ -1,6 +1,5 @@
 from flask_testing import TestCase
-from app.app import app
-from app.models import db
+from app.app import db, app
 import unittest
 import json
 
