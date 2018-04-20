@@ -79,8 +79,7 @@ project.  A special gratitude I give to my learning facilitator , whose contribu
 suggestions and encouragement has  helped me to coordinate my project.
 
 ### Author
-*** 
 Kasigazi Brian 
-***
+
 
 
