@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
 [![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=feature_challenge_3)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=feature_challenge_3)
-[![Maintainability](https://api.codeclimate.com/v1/badges/8cc3a4dcd5e37d903ad7/maintainability)](https://codeclimate.com/github/kasigazibrian/We-Connect-Kasigazi_Brian/maintainability)
+
 
 ## Description
 WeConnect provides a platform that brings businesses and individuals together.
