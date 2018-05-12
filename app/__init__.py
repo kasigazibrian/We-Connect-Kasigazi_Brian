@@ -1,3 +1,3 @@
-from app.Authentication import views
-from app.Reviews import views
-from app.Business import views
+from app.views import authentication
+from app.views import business
+from app.views import review

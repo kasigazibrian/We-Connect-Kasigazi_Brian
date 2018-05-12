@@ -1,0 +1,12 @@
+#!/Users/bryan/Desktop/workingone/We-Connect-Kasigazi_Brian/hc-venv/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'codeclimate-test-reporter==0.2.3','console_scripts','codeclimate-test-reporter'
+__requires__ = 'codeclimate-test-reporter==0.2.3'
+import re
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(
+        load_entry_point('codeclimate-test-reporter==0.2.3', 'console_scripts', 'codeclimate-test-reporter')()
+    )

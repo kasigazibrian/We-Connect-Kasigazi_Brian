@@ -67,7 +67,6 @@ python runserver.py
 | /api/businesses/```<businessId>```/reviews | POST | Add a review for a business|
 | /api/businesses/```<businessId>```/reviews | GET | Get all reviews for a business|
 
----
 
 ### Built-With
 * [Flask](http://flask.pocoo.org/docs/0.12/)

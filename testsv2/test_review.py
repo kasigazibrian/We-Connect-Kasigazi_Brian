@@ -1,3 +1,4 @@
+"""Review tests"""
 from flask_testing import TestCase
 from app.app import db, app
 import unittest
@@ -21,6 +22,7 @@ class BaseTestCase(TestCase):
             "business_location": "kampala",
             "contact_number": "256781712927",
             "business_email": "supercom@gmail.com",
+            "business_description": "This business provides the best wedding coverage"
 
         }
         self.reviews = [{"review": "This business is awesome"}, {"review": "This business rocks"},
@@ -39,7 +41,7 @@ class BaseTestCase(TestCase):
 
     def register_business(self, json_result):
         response = self.client.post("/api/v2/businesses", data=json.dumps(self.business),
-                                    headers={"access-token": json_result["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
         return response
 
     def add_review(self, review):

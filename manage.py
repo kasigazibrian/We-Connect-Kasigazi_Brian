@@ -1,4 +1,4 @@
-"""manage.py to handle falsk migrations"""
+"""manage.py to handle flask migrations"""
 import unittest
 from app.app import app
 from flask_script import Manager
@@ -20,6 +20,7 @@ def test():
         return 0
     else:
         return 1
+
 
 if __name__ == '__main__':
     manager.run()

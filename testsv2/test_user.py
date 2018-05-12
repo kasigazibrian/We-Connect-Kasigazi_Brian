@@ -1,3 +1,4 @@
+"""User tests"""
 import json
 import unittest
 from app.app import db, app
@@ -26,7 +27,7 @@ class BaseTestCase(TestCase):
     def register(self):
         tester = app.test_client(self)
         response = tester.post("/api/v2/auth/register", data=json.dumps(self.user),
-                                   content_type="application/json")
+                               content_type="application/json")
         return response
 
     def login(self):
@@ -150,7 +151,7 @@ class FlaskTestCase(BaseTestCase):
         json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         new_password = {'new_password': 'pineapple'}
         response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password),
-                                    headers={"access-token": json_result["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 201)
 
     def test_password_reset_with_no_new_password(self):
@@ -166,7 +167,7 @@ class FlaskTestCase(BaseTestCase):
         json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         new_password = {'new_password': ''}
         response = self.client.post("/api/v2/auth/reset-password", data=json.dumps(new_password),
-                                    headers={"access-token": json_result["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
     def test_valid_logout(self):
@@ -182,7 +183,7 @@ class FlaskTestCase(BaseTestCase):
         json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         new_password = {'password': 'pineapple'}
         response = self.client.post("/api/v2/auth/logout", data=json.dumps(new_password),
-                                    headers={"access-token": json_result["token"]}, content_type="application/json")
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 201)
 
 
