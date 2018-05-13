@@ -13,8 +13,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SWAGGER_UI_JSONEDITOR = True
     # Database URI
-    if "DATABASE" in os.environ:
-        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE")
+    if "DATABASE_URL" in os.environ:
+        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     else:
         SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:brian@localhost/weconnect'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
