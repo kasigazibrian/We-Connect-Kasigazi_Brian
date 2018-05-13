@@ -14,7 +14,7 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def test():
-    tests =  unittest.TestLoader().discover('./testsv2', pattern='test*.py')
+    tests = unittest.TestLoader().discover('./testsv2', pattern='test*.py')
     test_result = unittest.TextTestRunner(verbosity=2).run(tests)
     if test_result.wasSuccessful():
         return 0
