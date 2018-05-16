@@ -616,6 +616,34 @@ class FlaskTestCase(BaseTestCase):
                                    content_type="application/json")
         self.assertEqual(response.status_code, 400)
 
+    def test_business_email__unique_constraint_on_update(self):
+        """Tests if someone can update the business name with a name which is already available"""
+        # add a test user
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        # Then log in the user
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+        # get the token after logging in
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+
+        # Then register the business with user Moses as owner
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        # Then register another business with user Moses as owner
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.businesses[1]),
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+
+        # try to update business_name
+        self.businesses[0]["business_email"] = "real@gmail.com"
+        response = self.client.put("/api/v2/businesses/1",
+                                   data=json.dumps(self.businesses[0]), headers={"access-token": json_result["Token"]},
+                                   content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+
     def test_valid_business_update(self):
         """Tests if a business can be updated with a token"""
         # add a test user
@@ -634,9 +662,10 @@ class FlaskTestCase(BaseTestCase):
 
         # try to update business_name
         self.businesses[0]["business_name"] = "Toyota"
+        self.businesses[0]["business_email"] = "toyota@gmail.com"
         response = self.client.put("/api/v2/businesses/1",
-                              data=json.dumps(self.businesses[0]), headers={"access-token": json_result["Token"]},
-                              content_type="application/json")
+                                   data=json.dumps(self.businesses[0]), headers={"access-token": json_result["Token"]},
+                                   content_type="application/json")
         self.assertEqual(response.status_code, 201)
 
     def test_invalid_business_update(self):

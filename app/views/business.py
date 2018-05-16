@@ -58,7 +58,7 @@ class Businesses(Resource):
             return {"Message": "Business with this email address already exists", "Status": "Fail"}, 400
         new_business = Business(business_owner_id=business_owner_id, business_name=business_name,
                                 business_email=business_email, business_location=business_location,
-                                contact_number=contact_number,business_category=business_category,
+                                contact_number=contact_number, business_category=business_category,
                                 business_description=business_description)
 
         response = new_business.register_business(new_business)

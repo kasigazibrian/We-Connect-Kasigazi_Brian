@@ -5,6 +5,8 @@ from flask_heroku import Heroku
 
 app = Flask(__name__)
 
+# heroku = Heroku(app)
+
 app.config.from_object('config.DevelopmentConfig')
 
 db = SQLAlchemy(app)
@@ -15,5 +17,5 @@ api = Api(app, description="WeConnect provides a platform that brings businesses
                            " Below is the documentation for the WeConnect RESTFUL API built using flask-restplus",
           version=2)
 
-heroku = Heroku(app)
+
 

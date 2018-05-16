@@ -106,17 +106,20 @@ class Business(db.Model):
             return {'Message': 'Not enough privileges to perform action', "Status": "Fail"}, 401
 
         if business_name:
-            try:
+            business_in_db = Business.query.filter_by(business_name=business_name).first()
+            if not business_in_db or (business_in_db and
+                                           (business_in_db.business_id == business_id)):
                 business.business_name = business_name
                 db.session.commit()
-            except exc.IntegrityError:
+            else:
                 return {"Message": "Business with this name already exists", "Status": "Fail"}, 400
-
         if business_email:
-            try:
+            business_in_db = Business.query.filter_by(business_email=business_email).first()
+            if not business_in_db or (business_in_db and
+                                           (business_in_db.business_id == business_id)):
                 business.business_email = business_email
                 db.session.commit()
-            except exc.IntegrityError:
+            else:
                 return {"Message": "Business with this email already exists", "Status": "Fail"}, 400
 
         if business_location:
@@ -141,13 +144,13 @@ class Business(db.Model):
     @staticmethod
     def search_for_business(business_name="", location="", category="", limit=""):
         if business_name is not None:
-            # search for business based on its name
+            """search for business based on its name"""
             businesses = Business.query.filter(
                 Business.business_name.ilike("%{}%".format(business_name)))
             if not businesses:
                 return {"Businesses": [], 'Status': 'Success'}, 400
             if location is not None and category is None and limit is None:
-                # filter businesses based on location
+                """filter businesses based on location"""
                 businesses = businesses.filter(Business.business_location.ilike
                                                                ("%{}%".format(location))).all()
                 if len(businesses) == 0:
@@ -156,7 +159,7 @@ class Business(db.Model):
                 return response
 
             elif category is not None and location is None and limit is None:
-                # filter businesses based on category
+                """filter businesses based on category"""
                 businesses = businesses.filter(Business.business_category.ilike
                                                                ("%{}%".format(category))).all()
                 if len(businesses) == 0:
@@ -165,7 +168,7 @@ class Business(db.Model):
                 return response
 
             elif category is not None and location is not None and limit is None:
-                # filter business based on location and category
+                """ filter business based on location and category"""
                 business_search_result = businesses.filter(Business.business_location.ilike
                                                                ("%{}%".format(location)))
                 if not business_search_result:
@@ -178,7 +181,7 @@ class Business(db.Model):
                 return response
 
             elif category is not None and limit is not None and location is None:
-                # Search for business based on category
+                """Search for business based on category"""
                 business_search_result = businesses.filter(Business.business_category.ilike
                                                                ("%{}%".format(category)))
                 if not business_search_result:
@@ -192,7 +195,7 @@ class Business(db.Model):
                     return {"Message": "Make sure the limit is a valid integer value", 'Status': 'Fail'}, 400
 
             elif location is not None and limit is not None and category is None:
-                # search for business based on location
+                """ search for business based on location"""
                 business_search_result = businesses.filter \
                     (Business.business_location.ilike("%{}%".format(location)))
                 if not business_search_result:
@@ -224,7 +227,7 @@ class Business(db.Model):
                     return {'Message': 'Make sure the limit is a valid integer value', 'Status': 'Fail'}, 400
 
             elif limit is not None and location is None and category is None:
-                # limit number of businesses per page
+                """ limit number of businesses per page"""
                 try:
                     limit = int(limit)
                     businesses = businesses.paginate(per_page=limit, page=1, error_out=True).items
@@ -239,7 +242,7 @@ class Business(db.Model):
                 return response
 
         else:
-            # Get all businesses
+            """Get all businesses"""
             businesses = Business.query.all()
             if len(businesses) == 0:
                 return {"Businesses": [], 'Status': 'Success'}, 200
