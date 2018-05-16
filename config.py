@@ -12,6 +12,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     SWAGGER_UI_JSONEDITOR = True
+    CORS_HEADERS = 'Content-Type'
     # Database URI
     if "DATABASE_URL" in os.environ:
         SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")

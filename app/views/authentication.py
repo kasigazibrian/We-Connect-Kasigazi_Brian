@@ -65,7 +65,7 @@ api.authorizations = authorizations
 class Home(Resource):
     def get(self):
         """route to home page"""
-        return {'Message': 'You are Welcome!', "Status": "Success"}, 200
+        return {'Message': 'You are Welcome! You can access the documentation on /', "Status": "Success"}, 200
 
 
 class Register(Resource):
