@@ -21,3 +21,15 @@ class Utilities(object):
         if re.match(r"(^(?:m|M|male|Male|f|F|female|Female)$)", gender):
             return True
         return False
+
+    @staticmethod
+    def is_positive_number(positive_number):
+        if re.match(r"(?<![-.])\b[0-9]+\b(?!\.[0-9])", positive_number):
+            return True
+        return False
+
+    @staticmethod
+    def is_valid_string(string):
+        if re.match("^[A-Za-z]*$", string):
+            return True
+        return False

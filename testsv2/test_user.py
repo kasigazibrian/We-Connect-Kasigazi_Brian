@@ -58,7 +58,6 @@ class FlaskTestCase(BaseTestCase):
 
     def test_for_valid_gender(self):
         """Tests if api will fail to create a user if the email provided is not valid"""
-        tester = app.test_client(self)
         self.user['gender'] = 'boy'
         response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 400)
@@ -67,6 +66,30 @@ class FlaskTestCase(BaseTestCase):
         """Tests if a user account is created"""
         response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
+
+    def test_getting_user_profile(self):
+        """Tests if the user profile is returned"""
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        response = self.client.get("/api/v2/auth/register", headers={"access-token": json_result["Token"]},
+                                   content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+
+    def test_invalid_getting_user_profile(self):
+        """Tests if the user profile is returned"""
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get("/api/v2/auth/register", content_type="application/json")
+        self.assertEqual(response.status_code, 401)
 
     def test_username_availability(self):
         """Tests if a user account is created only once to show the username unique key constraint works"""

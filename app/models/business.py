@@ -36,7 +36,7 @@ class Business(db.Model):
     def to_json(businesses):
         business_list = []
         for business in businesses:
-            business_data = {}
+            business_data = dict()
             business_data['business_id'] = business.business_id
             business_data['business_owner_id'] = business.business_owner_id
             business_data['business_name'] = business.business_name
@@ -46,21 +46,15 @@ class Business(db.Model):
             business_data['business_category'] = business.business_category
             business_data['business_description'] = business.business_description
             business_list.append(business_data)
-        if len(business_list) == 1:
-            return {'Business': business_list, 'Status': 'Success'}, 200
-        return {'Businesses': business_list, 'Status': 'Success'}, 200
+        return {'Businesses': business_list, 'Status': 'Success'}
 
     @staticmethod
     def register_business(business):
         """Register a business"""
-        try:
-            db.session.add(business)
-            db.session.commit()
-            return {"Message": "Business " + business.business_name + " has been registered successfully",
-                    "Status": "Success"}, 201
-        except exc.IntegrityError:
-            db.session.rollback()
-            return {'Message': 'Database error. Please contact administrator ', 'Status': 'Fail'}, 500
+        db.session.add(business)
+        db.session.commit()
+        return {"Message": "Business " + business.business_name + " has been registered successfully",
+                "Status": "Success"}, 201
 
     @staticmethod
     def delete_business(business_id, user_id):
@@ -88,14 +82,15 @@ class Business(db.Model):
             return {'Business': business_result, "Status": "Success"}, 400
         business_result.append(business)
         response = Business.to_json(business_result)
-        return response
+        return response, 200
 
     @staticmethod
     def update_business(business_id, current_user, business_name, business_email, business_location,
                         contact_number, business_category, business_description):
+        business_id = int(business_id)
         business = Business.query.filter_by(business_id=business_id).first()
         if business is None:
-            return {'Message': 'Business not found', "Status": "Success"}, 400
+            return {'Message': 'Business not found', "Status": "Fail"}, 400
         user = User.query.filter_by(user_id=current_user.user_id).first()
         if user is None:
             return {'Message': 'Not enough privileges to perform this action. Please login', "Status": "Fail"}, 401
@@ -107,21 +102,18 @@ class Business(db.Model):
 
         if business_name:
             business_in_db = Business.query.filter_by(business_name=business_name).first()
-            if not business_in_db or (business_in_db and
-                                           (business_in_db.business_id == business_id)):
-                business.business_name = business_name
-                db.session.commit()
-            else:
-                return {"Message": "Business with this name already exists", "Status": "Fail"}, 400
+            if business_in_db:
+                if business_in_db.business_id != business_id:
+                    return {"Message": "Business with this name already exists", "Status": "Fail"}, 400
+            business.business_name = business_name
+            db.session.commit()
         if business_email:
             business_in_db = Business.query.filter_by(business_email=business_email).first()
-            if not business_in_db or (business_in_db and
-                                           (business_in_db.business_id == business_id)):
-                business.business_email = business_email
-                db.session.commit()
-            else:
-                return {"Message": "Business with this email already exists", "Status": "Fail"}, 400
-
+            if business_in_db:
+                if business_in_db.business_id != business_id:
+                    return {"Message": "Business with this email already exists", "Status": "Fail"}, 400
+            business.business_email = business_email
+            db.session.commit()
         if business_location:
             business.business_location = business_location
             db.session.commit()
@@ -142,120 +134,140 @@ class Business(db.Model):
         return {'Message': 'Business updated successfully', "Status": "Success"}, 201
 
     @staticmethod
-    def search_for_business(business_name="", location="", category="", limit=""):
-        if business_name is not None:
+    def get_paginated_list(url, page, limit, results):
+        """ Check if businesses exist """
+        if Utilities.is_positive_number(limit) and Utilities.is_positive_number(page):
+            limit = int(limit)
+            page = int(page)
+            businesses = results.paginate(per_page=limit, page=page, error_out=True)
+            json_result = Business.to_json(businesses=businesses.items)
+            count = businesses.total
+
+            # make response
+            business_object = dict()
+            business_object['page'] = page
+            business_object['limit'] = limit
+            business_object['count'] = count
+            business_object['number_of_pages'] = businesses.pages
+            """ Make urls """
+            # make previous url
+            if not businesses.has_prev:
+                business_object['previous'] = None
+            else:
+                page_copy = businesses.prev_num
+                business_object['previous'] = url + '?limit=%d&page=%d' % (limit, page_copy)
+            # make next url
+            if not businesses.has_next:
+                business_object['next'] = None
+            else:
+                page_copy = businesses.next_num
+                business_object['next'] = url + '?limit=%d&page=%d' % (limit, page_copy)
+            business_object['Businesses'] = json_result['Businesses']
+            business_object['Status'] = "Success"
+            return business_object, 200
+        return {"Message": "Make sure the limit or page has a valid integer value", 'Status': 'Fail'}, 400
+
+    @staticmethod
+    def search_for_business(business_name="", location="", url="", category="", page="1", limit="20"):
+        if business_name and not (location or category):
             """search for business based on its name"""
+
             businesses = Business.query.filter(
                 Business.business_name.ilike("%{}%".format(business_name)))
             if not businesses:
                 return {"Businesses": [], 'Status': 'Success'}, 400
-            if location is not None and category is None and limit is None:
-                """filter businesses based on location"""
-                businesses = businesses.filter(Business.business_location.ilike
-                                                               ("%{}%".format(location))).all()
-                if len(businesses) == 0:
-                    return {"Businesses": [], 'Status': 'Success'}, 400
-                response = Business.to_json(businesses)
-                return response
+            return Business.get_paginated_list(url=url, page=page, limit=limit, results=businesses)
 
-            elif category is not None and location is None and limit is None:
-                """filter businesses based on category"""
-                businesses = businesses.filter(Business.business_category.ilike
-                                                               ("%{}%".format(category))).all()
-                if len(businesses) == 0:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                response = Business.to_json(businesses)
-                return response
+        elif category and not (business_name or location):
+            """filter businesses based on category"""
 
-            elif category is not None and location is not None and limit is None:
-                """ filter business based on location and category"""
-                business_search_result = businesses.filter(Business.business_location.ilike
-                                                               ("%{}%".format(location)))
-                if not business_search_result:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                businesses = business_search_result.filter \
-                    (Business.business_category.ilike("%{}%".format(category))).all()
-                if len(businesses) == 0:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                response = Business.to_json(businesses)
-                return response
+            businesses = Business.query.filter(Business.business_category.ilike
+                                               ("%{}%".format(category)))
+            if not businesses:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=businesses)
+            return response
 
-            elif category is not None and limit is not None and location is None:
-                """Search for business based on category"""
-                business_search_result = businesses.filter(Business.business_category.ilike
-                                                               ("%{}%".format(category)))
-                if not business_search_result:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                try:
-                    limit = int(limit)
-                    businesses = business_search_result.paginate(per_page=limit, page=1, error_out=True).items
-                    response = Business.to_json(businesses)
-                    return response
-                except ValueError:
-                    return {"Message": "Make sure the limit is a valid integer value", 'Status': 'Fail'}, 400
+        elif (location and category) and not business_name:
+            """ filter business based on location and category"""
 
-            elif location is not None and limit is not None and category is None:
-                """ search for business based on location"""
-                business_search_result = businesses.filter \
-                    (Business.business_location.ilike("%{}%".format(location)))
-                if not business_search_result:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                try:
-                    limit = int(limit)
-                    businesses = business_search_result.paginate(page=1, per_page=limit, error_out=True).items
-                    response = Business.to_json(businesses)
-                    return response
-                except ValueError:
-                    return {"message": "Make sure the limit is a valid integer value", 'Status': 'Fail'}, 400
+            business_search_result = Business.query.filter(Business.business_location.ilike
+                                                           ("%{}%".format(location)))
+            if not business_search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            businesses = business_search_result.filter \
+                (Business.business_category.ilike("%{}%".format(category)))
+            if not businesses:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=businesses)
+            return response
 
-            elif location is not None and limit is not None and category is not None:
-                """search for business based on location and category and limit results per page"""
-                business_search_result = businesses.filter(Business.business_location.ilike
-                                                               ("%{}%".format(location)))
-                if not business_search_result:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                search_result = business_search_result.filter(Business.business_category.ilike
-                                                              ("%{}%".format(category)))
-                if not search_result:
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                try:
-                    limit = int(limit)
-                    businesses = search_result.paginate(per_page=limit, page=1, error_out=True).items
-                    response = Business.to_json(businesses)
-                    return response
-                except ValueError:
-                    return {'Message': 'Make sure the limit is a valid integer value', 'Status': 'Fail'}, 400
+        elif (category and business_name) and not location:
+            """Search for business based on category and business name"""
+            business_search_result = Business.query.filter(Business.business_name.ilike
+                                                           ("%{}%".format(business_name)))
+            if not business_search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            businesses = business_search_result.filter \
+                (Business.business_category.ilike("%{}%".format(category)))
+            if not businesses:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=businesses)
+            return response
 
-            elif limit is not None and location is None and category is None:
-                """ limit number of businesses per page"""
-                try:
-                    limit = int(limit)
-                    businesses = businesses.paginate(per_page=limit, page=1, error_out=True).items
-                    if len(businesses) != 0:
-                        response = Business.to_json(businesses)
-                        return response
-                    return {"Businesses": [], 'Status': 'Success'}, 200
-                except ValueError:
-                    return {"Message": "Make sure the limit is a valid integer value", 'Status': 'Fail'}, 400
-            else:
-                response = Business.to_json(businesses.all())
-                return response
+        elif location and not (business_name or category):
+            """ search for business based on location"""
+            if not Utilities.is_valid_string(location):
+                return {"Message": "Not a valid location", 'Status': 'Fail'}, 400
+            business_search_result = Business.query.filter \
+                (Business.business_location.ilike("%{}%".format(location)))
+            if not business_search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=business_search_result)
+            return response
+
+        elif (business_name and location) and not category:
+            """search for business based on location and business name"""
+            if not Utilities.is_valid_string(location):
+                return {"Message": "Not a valid location", 'Status': 'Fail'}, 400
+            business_search_result = Business.query.filter(Business.business_name.ilike
+                                                           ("%{}%".format(business_name)))
+            if not business_search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            search_result = business_search_result.filter(Business.business_location.ilike
+                                                          ("%{}%".format(location)))
+            if not search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=search_result)
+            return response
+
+        elif business_name and location and category:
+            """ Search for businesses based on business name, location and category"""
+            business_search_result = Business.query.filter(Business.business_name.ilike
+                                                           ("%{}%".format(business_name)))
+            if not business_search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            search_result = business_search_result.filter(Business.business_location.ilike
+                                                          ("%{}%".format(location)))
+            if not search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            search_result = business_search_result.filter(Business.business_category.ilike
+                                                          ("%{}%".format(category)))
+            if not search_result:
+                return {"Businesses": [], 'Status': 'Success'}, 200
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=search_result)
+            return response
 
         else:
             """Get all businesses"""
             businesses = Business.query.all()
             if len(businesses) == 0:
                 return {"Businesses": [], 'Status': 'Success'}, 200
-            if limit is not None:
-                try:
-                    limit = int(limit)
-                    businesses = Business.query.paginate(per_page=limit, page=1, error_out=True).items
-                    response = Business.to_json(businesses)
-                    return response
-                except ValueError:
-                    return {"Message": "Make sure the limit is a valid integer value", 'Status': 'Fail'}, 400
-            response = Business.to_json(businesses)
+            businesses = Business.query
+            response = Business.get_paginated_list(url=url, page=page, limit=limit, results=businesses)
             return response
+
+
 
 
 

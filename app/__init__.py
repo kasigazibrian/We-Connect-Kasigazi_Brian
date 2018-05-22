@@ -1,7 +1,3 @@
-from app.views import authentication
-from app.views import business
-from app.views import review
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restplus import Api
@@ -25,3 +21,6 @@ heroku = Heroku(app)
 
 cors = CORS(app)
 
+from app.views import authentication
+from app.views import business
+from app.views import review

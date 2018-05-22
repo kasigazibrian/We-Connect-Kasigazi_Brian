@@ -51,6 +51,7 @@ class User(db.Model):
                 'Message': 'You have successfully logged in',
                 'Status': 'Success',
                 'User': {'username': user.username,
+                         'user_id': user.user_id,
                          'email': user.email,
                          'first_name': user.first_name,
                          'last_name': user.last_name,
@@ -61,14 +62,11 @@ class User(db.Model):
     @staticmethod
     def add_user(user):
         """Register a user"""
-        try:
-            db.session.add(user)
-            db.session.commit()
-            return {'Message': 'User ' + user.first_name + ' has been registered successfully',
-                    "status": "Success"}, 201
-        except exc.IntegrityError:
-            db.session.rollback()
-            return {'Message': 'An error occurred. Please contact administrator', "Status": "Fail"}, 400
+        db.session.add(user)
+        db.session.commit()
+        return {'Message': 'User ' + user.first_name + ' has been registered successfully',
+                "Status": "Success"}, 201
+
 
     @staticmethod
     def reset_password(current_user, password):
@@ -96,16 +94,12 @@ class Token(db.Model):
     @staticmethod
     def blacklist_token(token, user):
         """add token to database"""
-        try:
-            user = User.query.filter_by(username=user).first()
-            user.login_status = False
-            token = Token.query.filter_by(token=token).first()
-            token.blacklist = True
-            db.session.commit()
-            return {'Message': 'You have successfully logged out', "Status": "Success"}, 201
-        except exc.ArgumentError:
-            db.session.rollback()
-            return {'Message': 'Database error. Please contact administrator ', 'Status': 'Fail'}, 500
+        user = User.query.filter_by(username=user).first()
+        user.login_status = False
+        token = Token.query.filter_by(token=token).first()
+        token.blacklist = True
+        db.session.commit()
+        return {'Message': 'You have successfully logged out', "Status": "Success"}, 201
 
     @staticmethod
     def is_blacklisted(token):

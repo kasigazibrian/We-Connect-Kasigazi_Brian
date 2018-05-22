@@ -5,6 +5,7 @@ from app import api
 from app.models.business import Business
 from app.views.authentication import jwt_required, authorizations
 from app.models.utilities import Utilities
+import os
 
 
 business_model = api.model('Business', {'business_name': fields.String('Business Name'),
@@ -18,6 +19,7 @@ business_model = api.model('Business', {'business_name': fields.String('Business
 
 api.authorizations = authorizations
 parser = reqparse.RequestParser()
+parser.add_argument(name='page', type=int, location='args', help='Start should be an integer value')
 parser.add_argument(name='limit', type=int, location='args', help='Limit should be an integer value')
 parser.add_argument(name='category', type=str, location='args', help='Business Category')
 parser.add_argument(name='location', type=str, location='args', help='Business Location')
@@ -43,7 +45,7 @@ class Businesses(Resource):
         if not business_name or not business_category or not business_location or not business_email or not \
                 contact_number or not business_description:
             return {"Message": "All fields are required, that is business_name, business_email,"
-                               "business_location, business_nominal_capital, business_category and "
+                               "business_location, business_category and "
                                "business_description", "Status": "Fail"}, 400
 
         if Utilities.is_valid_email(business_email) is False:
@@ -71,10 +73,13 @@ class Businesses(Resource):
         business_name = request.args.get('q')
         business_category = request.args.get('category')
         business_location = request.args.get('location')
-        limit = request.args.get('limit')
+        limit = request.args.get('limit', "20")
+        page = request.args.get('page', "1")
+        url = os.environ.get('base_url', "http://localhost:5000/")
+        url = url + '/api/v2/businesses'
 
         search_result = Business.search_for_business(business_name=business_name, location=business_location,
-                                                     category=business_category, limit=limit)
+                                                     category=business_category, limit=limit, page=page, url=url)
         return search_result
 
 
@@ -109,8 +114,8 @@ class BusinessOperations(Resource):
         contact_number = business_data.get('contact_number')
         business_category = business_data.get('business_category')
         business_description = business_data.get('business_description')
-        if not business_name or not business_category or not business_location or not business_email or not \
-                contact_number or not business_description:
+        if not business_name and not business_category and not business_location and not business_email and not \
+                contact_number and not business_description:
             return {"Message": "Please enter at least one value for the field you would like to edit.",
                     "Status": "Fail"}, 400
         if not business_email == "":

@@ -1,6 +1,7 @@
 """Reviews model"""
 from app import db
 from sqlalchemy import exc
+import datetime
 
 
 class BusinessReviews(db.Model):
@@ -8,6 +9,7 @@ class BusinessReviews(db.Model):
     review_id = db.Column(db.Integer, primary_key=True)
     business_id = db.Column(db.Integer, db.ForeignKey('business.business_id'))
     review = db.Column(db.VARCHAR(400))
+    date_created = db.Column(db.DateTime, default=datetime.datetime.now)
 
     def __init__(self, business_id, review):
         self.business_id = business_id
@@ -29,11 +31,13 @@ class BusinessReviews(db.Model):
         if not all_reviews:
             return {'Message': [], "Status": "Success"}, 400
         reviews_list = []
-        for my_review in all_reviews:
-            review_data = {}
-            review_data['business_id'] = my_review.business_id
-            review_data['review'] = my_review.review
+        for review in all_reviews:
+            review_data = dict()
+            dt = review.date_created.replace( microsecond=0)
+            review_data['date_created'] = str(dt)
+            review_data['business_id'] = review.business_id
+            review_data['review'] = review.review
             reviews_list.append(review_data)
-        if len(reviews_list) == 1:
-            return {'Business Review': reviews_list, "Status": "Success"}, 200
+        # if len(reviews_list) == 1:
+        #     return {'Business Review': reviews_list, "Status": "Success"}, 200
         return {'Business Reviews': reviews_list, "Status": "Success"}, 200

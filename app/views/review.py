@@ -7,7 +7,8 @@ from app.models.review import BusinessReviews
 review_model = api.model('Review', {'review': fields.String('Business Review')})
 
 review_out_model = api.model('Review_out', {'review': fields.String('Business review'),
-                                            'business_id': fields.String('Business ID')})
+                                            'business_id': fields.String('Business ID'),
+                                            'date_created': fields.DateTime(dt_format='rfc822')})
 
 
 class BusinessReviewsOperations(Resource):

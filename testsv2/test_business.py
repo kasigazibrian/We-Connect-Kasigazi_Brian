@@ -201,7 +201,7 @@ class FlaskTestCase(BaseTestCase):
         response = self.client.get("/api/v2/businesses/1")
         json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(len(json_result['Business']) == 1)
+        self.assertTrue(len(json_result['Businesses']) == 1)
 
     def test_getting_business_with_invalid_business_id(self):
         """Tests if API can not retrieve a business which does not exist"""
@@ -312,7 +312,7 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Retrieve business with category entertainment
-        response = self.client.get("/api/v2/businesses?q=med&category=enter")
+        response = self.client.get("/api/v2/businesses?category=enter")
         self.assertEqual(response.status_code, 200)
 
     def test_filtering_businesses_with__invalid_category(self):
@@ -359,7 +359,29 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
         # Retrieve business with location as kabale
-        response = self.client.get("/api/v2/businesses?q=med&location=ka")
+        response = self.client.get("/api/v2/businesses?location=ka")
+        self.assertEqual(response.status_code, 200)
+
+    def test_filtering_businesses_by_location_and_name(self):
+        """Tests if one can filter businesses by location"""
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        # Then log in the user
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        # get the token after logging in
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.businesses[1]),
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+
+        # Retrieve business with location as kabale and name real
+        response = self.client.get("/api/v2/businesses?q=real&location=ka")
         self.assertEqual(response.status_code, 200)
 
     def test_filtering_businesses_by_location_and_category(self):
@@ -428,6 +450,28 @@ class FlaskTestCase(BaseTestCase):
         response = self.client.get("/api/v2/businesses?q=real&location=5867")
         self.assertEqual(response.status_code, 400)
 
+    def test_filtering_businesses_by_category_and_location(self):
+        """Tests if one can filter businesses with invalid location"""
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        # Then log in the user
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        # get the token after logging in
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.businesses[1]),
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+
+        # Retrieve business with location as kabale
+        response = self.client.get("/api/v2/businesses?category=real&location=ka")
+        self.assertEqual(response.status_code, 200)
+
     def test_number_of_results_per_page_limit(self):
         """Tests if one can retrieve a specific business by name"""
         # add a test user
@@ -475,6 +519,30 @@ class FlaskTestCase(BaseTestCase):
         # Get all the business but limit the number to one per page
         response = self.client.get("/api/v2/businesses?q=real&limit=rttr")
         self.assertEqual(response.status_code, 400)
+
+    def test_previous_page_url(self):
+        """Tests if one can retrieve a specific business by name"""
+        # add a test user
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+
+        # get the token after logging in
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+        # Add the first business
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        # Add the second business
+        response = self.client.post("/api/v2/businesses", data=json.dumps(self.businesses[1]),
+                                    headers={"access-token": json_result["Token"]}, content_type="application/json")
+        self.assertEqual(response.status_code, 201)
+
+        # Get all the business but limit the number to one per page
+        response = self.client.get("/api/v2/businesses?limit=1&page=2")
+        self.assertEqual(response.status_code, 200)
 
     def test_deleting_business_without_token(self):
         """Tests if a business can be deleted without a token"""
@@ -543,6 +611,36 @@ class FlaskTestCase(BaseTestCase):
                                       content_type="application/json"
                                       )
         self.assertEqual(response.status_code, 401)
+
+    def test_deleting_non_existent_business(self):
+        """Tests if a business is deleted(to be modified)"""
+        # add a test user
+        response = BaseTestCase.register(self)
+        self.assertEqual(response.status_code, 201)
+
+        # Add another test user Mary
+        response = BaseTestCase.register2(self)
+        self.assertEqual(response.status_code, 201)
+
+        # Then log in the user moses
+        response = BaseTestCase.login(self)
+        self.assertEqual(response.status_code, 201)
+        # get the token after logging in
+        json_result = json.loads(response.data.decode('utf-8').replace("'", "\""))
+
+        # Then register the business with user Moses as owner
+        response = BaseTestCase.register_business(self, json_result)
+        self.assertEqual(response.status_code, 201)
+
+        response =  BaseTestCase.login2(self)
+        self.assertEqual(response.status_code, 201)
+
+        # Get Mary's login token
+        json_result= json.loads(response.data.decode('utf-8').replace("'", "\""))
+        response = self.client.delete("/api/v2/businesses/3", headers={"access-token": json_result["Token"]},
+                                      content_type="application/json"
+                                      )
+        self.assertEqual(response.status_code, 400)
 
     def test_updating_business_without_token(self):
         """Tests if a business can be updated without a token"""
@@ -617,7 +715,7 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_business_email__unique_constraint_on_update(self):
-        """Tests if someone can update the business name with a name which is already available"""
+        """Tests if someone can update the business name with an email which is already available"""
         # add a test user
         response = BaseTestCase.register(self)
         self.assertEqual(response.status_code, 201)
@@ -661,8 +759,6 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
         # try to update business_name
-        self.businesses[0]["business_name"] = "Toyota"
-        self.businesses[0]["business_email"] = "toyota@gmail.com"
         response = self.client.put("/api/v2/businesses/1",
                                    data=json.dumps(self.businesses[0]), headers={"access-token": json_result["Token"]},
                                    content_type="application/json")
@@ -685,7 +781,7 @@ class FlaskTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
 
         self.businesses[0]["business_name"] = "Toyota"
-        response = self.client.put("/api/v2/businesses/2", data= json.dumps(self.businesses[0]),
+        response = self.client.put("/api/v2/businesses/3", data= json.dumps(self.businesses[0]),
                               headers={"access-token": json_result["Token"]}, content_type="application/json")
         self.assertEqual(response.status_code, 400)
 

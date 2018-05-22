@@ -4,6 +4,7 @@ from flask_restplus import Resource, fields
 from app import app, api, db
 from werkzeug.security import generate_password_hash
 from app.models.authentication import User, Token
+from app.models.business import Business
 import jwt
 from functools import wraps
 from app.models.utilities import Utilities
@@ -102,6 +103,25 @@ class Register(Resource):
 
         response = User.add_user(new_user)
         return response
+
+    @jwt_required
+    @api.doc(responses={400: 'Bad Request', 200: 'Success', 201: 'Created', 401: 'Unauthorised', 500: 'Database Error'},
+             security='api_key')
+    def get(self, current_user):
+        """Get user profile data"""
+        user = User.query.filter_by(user_id=current_user.user_id).first()
+        businesses = Business.query.filter_by(business_owner_id=current_user.user_id).all()
+        business_object = Business.to_json(businesses)
+        return {'Message': 'User information retrieved successfully',
+                'Status': 'Success',
+                'User': {'username': user.username,
+                         'email': user.email,
+                         'first_name': user.first_name,
+                         'last_name': user.last_name,
+                         'gender': user.gender
+                         },
+                'Businesses': business_object["Businesses"]
+                }, 200
 
 
 class Login(Resource):
