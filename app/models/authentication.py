@@ -1,7 +1,7 @@
 """Authentication model"""
 from werkzeug.security import check_password_hash
 import jwt
-from app.app import app, db
+from app import app, db
 from datetime import datetime, timedelta
 from sqlalchemy import exc
 

@@ -1,6 +1,6 @@
 """Review tests"""
 from flask_testing import TestCase
-from app.app import db, app
+from app import db, app
 import unittest
 import json
 

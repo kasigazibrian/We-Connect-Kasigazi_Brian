@@ -1,5 +1,5 @@
 """Businesses model"""
-from app.app import db
+from app import db
 from sqlalchemy import exc
 from app.models.authentication import User
 from app.models.utilities import Utilities

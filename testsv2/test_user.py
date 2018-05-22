@@ -1,7 +1,7 @@
 """User tests"""
 import json
 import unittest
-from app.app import db, app
+from app import db, app
 from flask_testing import TestCase
 
 

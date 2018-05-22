@@ -1,5 +1,5 @@
 """Reviews model"""
-from app.app import db
+from app import db
 from sqlalchemy import exc
 
 

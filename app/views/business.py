@@ -1,7 +1,7 @@
 """Businesses views python file"""
 from flask import request
 from flask_restplus import Resource, fields, reqparse
-from app.app import api
+from app import api
 from app.models.business import Business
 from app.views.authentication import jwt_required, authorizations
 from app.models.utilities import Utilities

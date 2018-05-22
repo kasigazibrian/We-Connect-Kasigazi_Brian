@@ -1,6 +1,6 @@
 """manage.py to handle flask migrations"""
 import unittest
-from app.app import app
+from app import app
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from app.app import db

@@ -1,5 +1,5 @@
 """Business tests"""
-from app.app import app, db
+from app import app, db
 from flask_testing import TestCase
 import unittest, json
 

@@ -1,7 +1,7 @@
 """Authentication views python file"""
 from flask import request
 from flask_restplus import Resource, fields
-from app.app import app, api, db
+from app import app, api, db
 from werkzeug.security import generate_password_hash
 from app.models.authentication import User, Token
 import jwt
