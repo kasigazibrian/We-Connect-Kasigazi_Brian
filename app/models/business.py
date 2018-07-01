@@ -1,6 +1,5 @@
 """Businesses model"""
 from app import db
-from sqlalchemy import exc
 from app.models.authentication import User
 from app.models.utilities import Utilities
 
@@ -15,7 +14,7 @@ class Business(db.Model):
     contact_number = db.Column(db.VARCHAR(15))
     business_description = db.Column(db.VARCHAR(300))
     business_category = db.Column(db.VARCHAR(150))
-    business_review = db.relationship('BusinessReviews', backref='review_owner', lazy='dynamic')
+    business_review = db.relationship('BusinessReviews',  backref='review_owner', lazy='dynamic')
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),

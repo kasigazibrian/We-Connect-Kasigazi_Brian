@@ -75,7 +75,7 @@ class Businesses(Resource):
         business_location = request.args.get('location')
         limit = request.args.get('limit', "20")
         page = request.args.get('page', "1")
-        url = os.environ.get('base_url', "http://localhost:5000/")
+        url = os.environ.get('base_url', "http://localhost:5000")
         url = url + '/api/v2/businesses'
 
         search_result = Business.search_for_business(business_name=business_name, location=business_location,

@@ -29,7 +29,7 @@ class BusinessReviews(db.Model):
     def get_all_reviews(business_id):
         all_reviews = BusinessReviews.query.filter_by(business_id=business_id).all()
         if not all_reviews:
-            return {'Message': [], "Status": "Success"}, 400
+            return {'Business Reviews': [], "Status": "Success"}, 400
         reviews_list = []
         for review in all_reviews:
             review_data = dict()
