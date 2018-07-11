@@ -1,79 +1,84 @@
-# We-Connect-Kasigazi_Brian
+# We Connect
 
-Andela cohort vi extended bootcamp challenge
 
-[![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=feature_challenge_2)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
-
+[![Build Status](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian.svg?branch=master)](https://travis-ci.org/kasigazibrian/We-Connect-Kasigazi_Brian)
 [![Coverage Status](https://coveralls.io/repos/github/kasigazibrian/We-Connect-Kasigazi_Brian/badge.svg?branch=master)](https://coveralls.io/github/kasigazibrian/We-Connect-Kasigazi_Brian?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/8cc3a4dcd5e37d903ad7/maintainability)](https://codeclimate.com/github/kasigazibrian/We-Connect-Kasigazi_Brian/maintainability)
 
 ## Description
 WeConnect provides a platform that brings businesses and individuals together.
 This platform creates awareness for businesses and gives the users the ability
 to write reviews about the businesses they have interacted with.
 
-
-**Authors and contributors**
- 
- ***Kasigazi Brian,***
- ***Daniel Sebuuma,***
-***Ashaba John,***
- ***Jim Daniel Wasswa,*** 
- ***Paulus Jagwe,*** 
-
-
----
-## Installation procedure
+## Getting Started
+* Clone the repository by running the command
 ```
-run the "pip install -r requirements.txt" to install all the dependencies
+  git clone https://github.com/kasigazibrian/We-Connect-Kasigazi_Brian.git -b feature_challenge_3
+```
+* Navigate to the root folder
+```
+cd We-Connect-Kasigazi_Brian
+
+```
+### Pre-requisites
+* [Python](https://docs.python.org/3/) version 3.6
+* [PostgreSQL](https://www.postgresql.org/docs/current/static/tutorial.html)
+
+### Installation procedure
+* Run the command below to install all the dependencies
+```
+ pip install -r requirements.txt
+```
+### Setting up the databases and running migrations
+```
+ python manage.py db init
+ python manage.py db migrate
+ python manage.py db upgrade
+```
+### Running the tests
+* Run the command below to run the tests
+```
+$ pytest
 ```
 
-
-### Dependencies
+### Running the API
+* Run the command below to run the API
 ```
-astroid==1.6.1
-
-attrs==17.4.0
-
-click==6.7
-
-colorama==0.3.9
-
-Flask==0.12.2
-
-Flask-JWT==0.3.2
-
-flask-swagger==0.2.13
-
-isort==4.3.4
-
-itsdangerous==0.24
-
-Jinja2==2.10
-
-lazy-object-proxy==1.3.1
-
-MarkupSafe==1.0
-
-mccabe==0.6.1
-
-pluggy==0.6.0
-
-py==1.5.2
-
-PyJWT==1.4.2
-
-pylint==1.8.2
-
-pytest==3.4.1
-
-PyYAML==3.12
-
-six==1.11.0
-
-Werkzeug==0.14.1
-
-wrapt==1.10.11
+python runserver.py
 ```
-=======
+* Find the API swagger documentation on the link below to access the different API endpoints
+```
+ http://localhost:5555/
+```
+
+## API endpoints and their functionality
+
+| API Endpoint | HTTP Method | Functionality | 
+| :--- | :--- | :--- | 
+| /api/auth/register | POST | Creates a user account |
+| /api/auth/login | POST | Logs in a user | 
+| /api/auth/logout | POST | Logs out a user|
+| /api/auth/reset-password| POST | Password reset |
+| /api/businesses| POST | Register a business|
+| /api/businesses/```<businessId>``` | PUT | Updates a business profile|
+| /api/businesses/```<businessId>``` | DELETE | Remove a business |
+| /api/businesses | GET | Retrieves all businesses |
+| /api/businesses/```<businessId>``` | GET | Get a business |
+| /api/businesses/```<businessId>```/reviews | POST | Add a review for a business|
+| /api/businesses/```<businessId>```/reviews | GET | Get all reviews for a business|
+
+
+### Built-With
+* [Flask](http://flask.pocoo.org/docs/0.12/)
+* [Flask-Sqalchemy](http://flask-sqlalchemy.pocoo.org/2.3/)
+
+### Acknowledgements
+I would like to express my deepest appreciation to all those who have provided me the possibility to work on this 
+project.  A special gratitude I give to my learning facilitator , whose contribution in stimulating
+suggestions and encouragement has  helped me to coordinate my project.
+
+### Author
+Kasigazi Brian 
+
 
 

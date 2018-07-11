@@ -1,2 +1,4 @@
-service_name: travis-pro
-repo_token: jmfp8FR6KeFMEGG2OSHjp0Vk3x6OwKRHy
+service_name:
+  - travis-ci
+repo_token:
+  -  QiShtMjcnOBpSJ8XJwLqVRnPWVEV0P8jq

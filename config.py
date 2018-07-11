@@ -1,4 +1,5 @@
 """Config.py"""
+import os
 
 
 class Config(object):
@@ -9,13 +10,21 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
-    # Enable debugging
     DEBUG = True
+    SWAGGER_UI_JSONEDITOR = True
+    CORS_HEADERS = 'Content-Type'
+    # Database URI
+    if "DATABASE_URL" in os.environ:
+        SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    else:
+        SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:brian@localhost/weconnect'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+
 
 class TestingConfig(Config):
     # Enable testing
     TESTING = True
-    DEBUG = True
 
-
-
+    #Tests URI
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:brian@localhost/tests'
+    SQLALCHEMY_TRACK_MODIFICATIONS = True

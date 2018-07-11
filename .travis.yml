@@ -5,17 +5,28 @@ cache: pip
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - pip install coveralls
-  - pip install coverage
+
+# Add service
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database tests;' -U postgres
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
 
 # command to run tests
 script:
-  - pytest tests/test_user.py
-  - pytest tests/test_business.py
-  - pytest tests/test_review.py
+  - pytest
+  - coverage run --source='.' --omit='runserver.py' manage.py test
+  - coverage report
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT -r 301b6b7f91988afb27219156ae610db19fb6aca7cca8a71e57892481589fbf23
 
 after_success:
-  -coverage report
-  -coveralls
+  - coveralls
+  - codeclimate-test-reporter
   #upload reports to coveralls.io
 

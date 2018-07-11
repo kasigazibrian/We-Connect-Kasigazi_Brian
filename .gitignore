@@ -1,2 +1,7 @@
 /venv/
 /.idea/
+.coverage
+__pycache__/
+*.pyc
+.pytest_cache/
+migrations/
